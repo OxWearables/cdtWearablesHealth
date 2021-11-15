@@ -1,8 +1,11 @@
 ---
 title: "Compositional Data Analysis Tutorial"
+pkgdown:
+  as_is: true
 output: 
-  rmarkdown::html_vignette:
+  rmarkdown::html_document:
     number_sections: true
+    toc: true
 bibliography: library.bib
 vignette: >
   %\VignetteIndexEntry{Compositional Data Analysis Tutorial}
@@ -31,7 +34,7 @@ library(ggplot2)
 
 
 # A basic analysis
-This tutorial illustrates some steps of an epidemiological analysis with a compositional exposure. It uses a package, `epicoda`, we have developed for this purpose. More information about any function we use can be found by running `?function_name` (as usual). Please note that the package is under active (including very recent!) development, and has been tested in a limited range of scenarios, so you may well find bugs. If you do, or if anything isn't clear, please do get in touch! (rosemary.walmsley@gtc.ox.ac.uk)
+This tutorial is an optional additional tutorial on Compositional Data Analysis for movement behaviour data. Compositional Data Analysis is an approach to the analysis of compositional data which has become increasingly popular in movement behaviour epidemiology in recent years. This tutorial illustrates some steps of an epidemiological analysis with a compositional exposure. It uses a package, `epicoda`, we have developed for this purpose. More information about any function we use can be found by running `?function_name` (as usual). Please note that the package is under active development, and has been tested in a limited range of scenarios, so you may well find bugs. If you do, or if anything isn't clear, please do get in touch! (rosemary.walmsley@gtc.ox.ac.uk)
 
 This tutorial is closely based on one of the package vignettes... Which was itself based on an earlier version of this tutorial!
 

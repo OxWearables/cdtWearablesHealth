@@ -1,0 +1,201 @@
+---
+title: "A Basic Health Association Analysis"
+pkgdown:
+  as_is: true
+output: 
+  rmarkdown::html_document:
+    number_sections: true
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{A Basic Health Association Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r,  include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+knitr::opts_chunk$set(fig.width=12, fig.height=8)
+library(rmarkdown)
+library(knitr)
+```
+
+In this tutorial, we will go through a basic health association analysis using movement behaviour data.
+
+As well as external packages, we'll use some helper functions we've prepared previously. If you want to modify them, you can find them in the file `R/utils.R` on the GitHub page (see also intro notes).
+
+#  Load in data
+First we will load required packages, and the data we already prepared.
+
+```{r load-packages}
+# First we need to install packages that aren't already present. 
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(devtools, ggplot2, reshape2, data.table, table1)
+
+# Load helper functions
+source("../R/utils.R")
+
+# We then load the data prepared in the last tutorial.
+# To do this with example data, replace the file location below with 
+# "/cdtshared/wearables/health_data_files/dataset-with-preprocessing-done.csv" 
+df <- data.frame(fread("../data_and_data_prep/dataset-with-preprocessing-done.csv"))
+```
+
+Note that this dataset has had some additional preprocessing (like that described at the end of the last tutorial) of the variables we're going to use e.g. collapsing classes and removing missing data. Please make sure you've done this for the variables you're using!
+
+Here are some bits of extra prep: 
+
+- We need to make sure some variables are factors, as subsequent code relies on that. If you change the variables you use, you might need to add some variables here.
+- I added in variables scaling the movement behaviour variables to the number of hours or minutes in a day. 
+- We will use an overall activity variable chopped by quintile in the data.
+```{r final-prep}
+df$sex <- as.factor(df$Sex)
+df$broadAgeGroup <- as.factor(df$broadAgeGroup)
+
+behaviour_vars <- c("MVPA", "LIPA", "SB", "sleep")
+for (variable in behaviour_vars){
+  df[, paste0(variable, "_min_per_day")] <- 24*60*df[, variable]
+  df[, paste0(variable, "_hr_per_day")] <- 24*df[, variable]
+}
+
+df$acc_quintiles <- cut(df$acc.overall.avg, breaks = c(quantile(df$acc.overall.avg, probs = seq(0, 1, by = 0.2), na.rm = TRUE))) # cut at quintiles
+```
+
+
+#  Describe and explore the data
+This section provides a few examples of descriptive analyses.
+
+As always, it's worth spending some time here getting to know the data. Are the patterns as you would expect? Does it raise any potential issues? (e.g. when thinking about confounding)
+
+The analyses here are just a sample of what you could do - please do add to them. 
+
+## Tables to describe the data
+The following code constructs a table to describe participant characteristics (e.g. age, sex) by quintile of overall acitvity.
+
+We are cheating a bit here by using a package that generates a nicely formatted table. You can of course write your own code to make a table of what you're interested in. 
+
+```{r table}
+table1::table1(~ sex + broadAgeGroup | acc_quintiles, data=df)
+```
+
+## Plots to describe the data
+We'll also plot some of the variables to get a feel for how they're distributed.
+
+```{r}
+# overall physical activity
+hist(df$acc.overall.avg, breaks=1000, xlim=c(0,100))
+
+#look at deciles
+quantile(df$acc.overall.avg, prob = seq(0.1, 0.9, by = 0.1), na.rm = TRUE)
+
+# MVPA
+hist(df$MVPA_min_per_day, breaks=1000, xlim=c(0,300))
+
+#look at deciles
+quantile(df$MVPA_min_per_day, prob = seq(0.1, 0.9, by = 0.1), na.rm = TRUE)
+```
+
+We can have a look at some of the machine-learned variables, to see if we believe them! Here we'll look at plots of probability of being in a particular behaviour by time of day:
+```{r}
+plotAverageDay(df, "sleep.hourOfDay.", ".avg", "Sleep (probability)")
+
+```
+
+Now let's look descriptively at something we might expect to vary as activity status varies: BMI. This is just a descriptive plot i.e. it's not adjusted for any other behaviours. 
+
+```{r}
+plotVarAndQuintile(df, # dataset
+                   'acc.overall.avg', # exposure
+                   'BMI', # outcome
+                   FALSE # [TRUE/FALSE] save plots to PDF
+                  )
+```
+
+# Run a simple health association analysis
+
+Let's run a minimally (age and sex) adjusted linear model for BMI, against fifths of average acceleration vector magnitude. This is attempting to model statistically the association we were looking at descriptively in the end of the last section.
+
+```{r}
+min_adj_lm_BMI <- lm(BMI ~acc_quintiles + broadAgeGroup+ sex, df)
+```
+
+We can look at the model summary:
+```{r}
+summary(min_adj_lm_BMI)
+```
+
+We can also look at the [model diagnostics](http://www.sthda.com/english/articles/39-regression-model-diagnostics/161-linear-regression-assumptions-and-diagnostics-in-r-essentials/) to understand more about the fit of the model: 
+```{r}
+plot(min_adj_lm_BMI)
+```
+The problem with the Q-Q plot is caused by the BMI distribution - log-transforming the outcome would be a good option in this case.  
+
+# Next steps for modelling 
+
+Here we've looked at a very simple linear model. Next steps might be:
+
+- adjusting for confounders (e.g. perhaps socioeconomic status affects both level of activity and BMI)
+- refining the definition of the exposure or looking at different exposure variables
+- looking at different outcomes
+- logistic regression for prevalent disease (use the `glm` function)
+- Cox regression for incident disease (see for example the `survival` package and the `coxph` function)
+
+# Getting started with Cox regression
+
+For example, here's an initial Cox regression analysis associating quintiles of overall acceleration with incident ischaemic heart disease.
+
+First we need to set up the data in an appropriate format, with a follow-up time and an indicator at exit indicating whether the participant exited due to an event or due to being censored (either the participant died of another cause or study data ended before they had an event).
+```{r}
+# Exclude participants with prevalent IHD
+cat(sum(df$ischaemic.heart.disease.prevalent), " were excluded due to prior ischaemic heart disease")
+df <- df[df$ischaemic.heart.disease.prevalent == 0, ]
+
+# We need to process participants who died as they are censored earlier
+# Replace the file location below with "/cdtshared/wearables/health_data_files/death.txt"
+death <- read.csv("../data_and_data_prep/death.txt",
+           sep = "\t")
+death <- death[death$ins_index == 0, ]  #Keep just one record per participant (a very small number of participants have duplicate records)
+df$died <- 0
+df$died[df$eid %in% death$eid ] <- 1 # Add an indicator for death
+df <- merge(df[, colnames(df)[colnames(df) != "date_of_death"]], death[, c("eid", "date_of_death")], by = "eid", all.x = TRUE)
+cat(sum(df$died), "participants died")
+
+# Note censoring dates of 31.12.20 in England/Scotland and 28.02.2018 in Wales (https://biobank.ndph.ox.ac.uk/ukb/exinfo.cgi?src=Data_providers_and_dates) 
+df$censoring <- as.Date("31/12/2020", format = "%d/%m/%Y")
+df$censoring[df$UkBiobankAssessCent %in% c("Cardiff", "Wrexham", "Swansea")] <- as.Date("28/02/2018", format = "%d/%m/%Y")
+
+# For people who died, we need to censor them at the earliest of their date of death and overall censoring (e.g. a participant in Wales who died in 2020 should nonetheless be # censored at 28.02.2018 - if they had an IHD event in 2019 we wouldn't know about it
+died <- (df$died == 1)
+df$censoring[died] <- pmin(df$censoring[died], as.Date(df$date_of_death[died], format = "%d/%m/%Y"))
+
+# Add follow up variable (censor date for participants without an event, event date for participants with an event)
+df$follow_up <- df$censoring
+had_ihd <- df$ischaemic.heart.disease.incident == 1 # make indicator variable
+df$follow_up[had_ihd] <- pmin(as.Date(df$ischaemic.heart.disease[had_ihd], format = "%Y-%m-%d"), df$censoring[had_ihd])
+
+# Note event status at censoring (again, care taken as there are some instances of entries in the data after censoring)
+df$IHD_at_exit <- 0
+df$IHD_at_exit[had_ihd & (as.Date(df$ischaemic.heart.disease, format = "%Y-%m-%d") == df$follow_up)] <- 1
+cat(sum(df$IHD_at_exit), " had incident hospital diagnosed ischaemic heart disease within the follow up period")
+
+# Calculate follow up time 
+df$fu_time <- as.numeric(difftime(df$follow_up, as.Date(df$EndTimWear, "%Y-%m-%d %H:%M:%S", tz = "Europe/London")))
+```
+
+When working with date data, especially when dates are only present for some participants, it is very easy to write code which behaves in strange ways... I did so several times when writing this example (and don't guarantee it's error-free now). It is well worth inspecting your data repeatedly to check that the code is doing what you expect. This is obviously not shown here as I can't print the data frame on the internet... Bear this in mind when using RMarkdown.
+
+We now have an event status indicator at exit and a follow-up time variable, which is enough to run a Cox model (using the `survival` package in R): 
+```{r}
+library(survival)
+cox_model <- coxph(Surv(fu_time, IHD_at_exit) ~ broadAgeGroup + sex + acc_quintiles, df)
+summary(cox_model)
+```
+The `exp(coef)` column gives the hazard ratio. Not surprisingly, older age and male sex are associated with higher risk of ischaemic heart disease, whereas a higher level of activity is associated with a lower risk of ischaemic heart disease. Again, you would probably want to substantially refine this model. For example, it would be good to adjust for possible confounders, and you might also want to look into model diagnostics to understand if assumptions, such as the [proportional hazards assumption](https://thomaselove.github.io/432-notes/cox-regression-models-for-survival-data-example-1.html) (see section 23.2.5 and 23.2.6). You might want to refine the outcome definition - e.g. a different set of ICD-10 codes, or adding in ischaemic heart disease events recorded only on the death register (by using information in `death_cause.txt`).  
+
+A bonus: here we've adjusted the model for baseline age (in fact, in very crude groups) and used time-on-study as the timescale in the Cox regression analysis. This is what most introductory texts do. However, in epidemiological studies, time-on-study might not be the most relevant timescale. [Age might be a more appropriate timescale...](https://journals.lww.com/epidem/Fulltext/2012/07000/Proportional_Hazards_Regression_in_Epidemiologic.9.aspx)
+
+
+Have fun! :) 
+

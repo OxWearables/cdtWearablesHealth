@@ -1,10 +1,11 @@
-pandoc: 2.11.4
+pandoc: 2.14.0.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  0_GettingSetupWithRStudio: 0_GettingSetupWithRStudio.html
-  1_DataPrep: 1_DataPrep.html
-  2_HealthAssociationAnalysis: 2_HealthAssociationAnalysis.html
-  3_IntroToCompositionalDataAnalysis: 3_IntroToCompositionalDataAnalysis.html
-last_built: 2021-03-25T15:12Z
+  0_IntroHealthAssociationAnalysis: 0_IntroHealthAssociationAnalysis.html
+  1_GettingSetupWithRStudio: 1_GettingSetupWithRStudio.html
+  2_DataPrep: 2_DataPrep.html
+  3_HealthAssociationAnalysis: 3_HealthAssociationAnalysis.html
+  4_IntroToCompositionalDataAnalysis: 4_IntroToCompositionalDataAnalysis.html
+last_built: 2021-11-15T15:18Z
 
