@@ -1,10 +1,10 @@
 ---
-title: "Introduction to Health Association Analysis for Movement Behaviour Data"
+title: "A Basic Health Association Analysis"
 output: 
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{Introduction to Health Association Analysis for Movement Behaviour Data}
+  %\VignetteIndexEntry{A Basic Health Association Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 knitr::opts_chunk$set(fig.width=12, fig.height=8)
 library(rmarkdown)
 library(knitr)
-devtools::load_all()
 ```
 
 In this tutorial, we will go through a basic health association analysis using movement behaviour data.
@@ -30,10 +29,10 @@ First we will load required packages, and the data we already prepared.
 ```{r load-packages}
 # First we need to install packages that aren't already present. 
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(devtools, ggplot2, reshape2, data.table)
+pacman::p_load(devtools, ggplot2, reshape2, data.table, table1)
 
-# If you've installed this as a package you can load helper functions like this
-library(week2DataChallenge)
+# Load helper functions
+source("R/utils.R")
 
 # We then load the data prepared in the last tutorial.
 # To do this with example data, replace the file location below with 
@@ -41,9 +40,13 @@ library(week2DataChallenge)
 dAll <- data.frame(fread("../data_and_data_prep/dataset-with-preprocessing-done.csv"))
 ```
 
-Note that this dataset has had some additional preprocessing (like that described at the end of the last tutorial) of the variables we're going to use e.g. collapsing classes and removing missing data. Please make sure you've done this for the ones you're using!!
+Note that this dataset has had some additional preprocessing (like that described at the end of the last tutorial) of the variables we're going to use e.g. collapsing classes and removing missing data. Please make sure you've done this for the variables you're using!
 
-We need to make sure some variables are factors, as subsequent code relies on that. If you change the variables you use, you might need to add some variables here. I also added in variables scaling the movement behaviour variables to the number of hours or minutes in a day: 
+Here are some bits of extra prep: 
+
+- We need to make sure some variables are factors, as subsequent code relies on that. If you change the variables you use, you might need to add some variables here.
+- I added in variables scaling the movement behaviour variables to the number of hours or minutes in a day. 
+- We will use an overall activity variable chopped by quintile in the data.
 ```{r final-prep}
 dAll$sex <- as.factor(dAll$Sex)
 dAll$broadAgeGroup <- as.factor(dAll$broadAgeGroup)
@@ -54,117 +57,25 @@ for (variable in behaviour_vars){
   dAll[, paste0(variable, "_hr_per_day")] <- 24*dAll[, variable]
 }
 
+dAll$acc_quintiles <- cut(dAll$acc.overall.avg, breaks = c(quantile(dAll$acc.overall.avg, probs = seq(0, 1, by = 0.2), na.rm = TRUE))) # cut at quintiles
 ```
 
 
 #  Describe and explore the data
+This section provides a few examples of descriptive analyses.
+
+As always, it's worth spending some time here getting to know the data. Are the patterns as you would expect? Does it raise any potential issues? (e.g. when thinking about confounding)
+
+The analyses here are just a sample of what you could do - please do add to them. 
+
 ## Tables to describe the data
-The following code constructs a table to describe accelerometer measured attributes by conventional groupings (e.g. age, sex, self-rated health, season). 
+The following code constructs a table to describe participant characteristics (e.g. age, sex) by quintile of overall acitvity.
 
-The code might look excessively complicated, because we wanted to save it as a html output. You could do the same thing using R data frames, and then work out formatting afterwards... 
-
+We are cheating a bit here by using a package that generates a nicely formatted table. You can of course write your own code to make a table of what you're interested in. 
 
 ```{r table}
-# specify groups (i.e. major row blocks)
-groups <-  c( "sex", "broadAgeGroup") # Fill this in with groups you want to look at
-
-# specify accelerometer outcomes (i.e. column headings)
-outcomeCols <- c( "acc.overall.avg", "LIPA_hr_per_day") # Fill this in with a list of outcomes you want to look at
-
-
-# specify output file name
-outHTML<-'table1.html'
-
-# write table header code
-html <- '<html><head><title>Acc summary table</title></head><table>'
-html <- paste(html, '<tr><th></th>')
-html <- paste(html, '<th>Individuals</th>')
-for(col  in outcomeCols){
-    html<-paste(html, '<th>', col, '</th>')
-}
-html <- paste(html, '</tr>')
-html <- paste(html, '<tr><th></th>')
-html <- paste(html, '<th>[ n ]</th>')
-html <- paste(html, '<th>[mean &plusmn stdev m<i>g</i>]</th>')
-html <- paste(html, '<th>[mean &plusmn stdev LIPA hr/dy]</th>')
-
-# iterate through each major row block
-for(group in groups){
-    html<-paste(html, '\n<tr><td><b>', group, '</b></td><td></td><td></td><td>')
-    html<-paste(html, '</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>')
-    group.tmp <- data.frame(matrix(ncol=4, nrow=0)) #df to store outputs for subsequent effect size calculations
-    colnames(group.tmp) <- c("item", "outcome", "avg", "stdev")
-    # report mean/stdev/n summary stats for each "item" in group e.g. each age category
-    for(item in levels(dAll[[group]])){
-        html<-paste(html, '<tr>')
-        html<-paste(html, '<td>', item, '</td>')
-        # temp store of all relevant outcome data related to this "item"
-        itemData <- dAll[dAll[[group]]==item, outcomeCols]
-        n <- nrow(itemData)
-        html <- paste(html, '<td align="center">', format(n,big.mark=","), '</td>')
-
-        # iterate through each accelerometer outcome (i.e. each column)
-        for(outcome in outcomeCols){
-            html <- paste(html, summary4tableHTML_simple(itemData[[outcome]],1))
-            avg <- mean(itemData[[outcome]], na.rm=TRUE)
-            stdev <- sd(itemData[[outcome]], na.rm=TRUE)
-            n <- nrow(itemData)
-            group.tmp <- rbind(group.tmp, data.frame(item= item, outcome=outcome,
-                                     avg=avg, stdev=stdev, n = n))
-        }
-        html<-paste(html, '</tr>')
-    }
-
-
-# now calculate ANOVA p-value between subgroup "items" for each acc outcome
-html<-paste(html, '<tr><td>p value<sup>A</sup></td><td></td>')
-for(outcome in outcomeCols){
-  formulaStr <- paste(outcome,' ~ ', group)
-  itemANOVA <- aov(as.formula(formulaStr), data=dAll)
-  
-  # extract p-value for specific variable of interest
-  tmp <- as.data.frame(summary(itemANOVA)[[1]])
-  groupResult <- tmp[grep(group, rownames(tmp)), "Pr(>F)"]
-  
-  # write formatted p-value to html
-  html <- paste(html, pValueHTML_cell(groupResult,1e-300))        
- }
- html <- paste(html, '</tr>')
- 
- # calculate effect size between subgroup "items" for each acc outcome
- html <- paste(html, "<tr><td>Cohen's d</td><td></td>")
- for(outcome in outcomeCols){
-   # read relevant subgroup mean/stdev values stored from summary stats derived earlier
-  grouping <- group.tmp[(group.tmp[, "outcome"] ==outcome),]
-  minVal <- min(grouping['avg'])
-  maxVal <- max(grouping['avg'])
-  lowest <- grouping[(grouping$avg==minVal), c('avg','stdev', 'n')]
-  highest <- grouping[(grouping$avg==maxVal), c('avg','stdev', 'n')]
-  print(grouping)
-  
-  # calculate Cohen's d effect size and format for HTML output
-  cohenD <- effectSize(lowest$avg,lowest$stdev, lowest$n, highest$avg,highest$stdev, highest$n)
-  cohenD <- format(round(cohenD, 2), nsmall=2)
-  cohenD <- sub('^(-)?0[.]', '\\1.', cohenD)
-  html <- paste(html, '<td align="center">', cohenD, '</td>')
- }
-
-  html <- paste(html, '</tr>')
-
-}
-#finalise HTML table
-html <- paste(html, '\n</table>')
-html <- paste(html, '<br><i><sup>A</sup> Age, sex:</i> ')
-html <- paste(html, 'One-way analysis of variance test used to compare metrics between groups')
-html <- paste(html, '</html>')
-# and write html to file
-write(html, file = outHTML)
-
-print(paste0('standard table done, written to: ', outHTML))
-knitr::include_url(outHTML)
+table1::table1(~ sex + broadAgeGroup | acc_quintiles, data=dAll)
 ```
-
-You might think more about the distribution of some of the accelerometry-derived variables - for some, this may not be the best way to characterise them (for example, the distribution of MVPA is very skewed). But it's good for a first description!
 
 ## Plots to describe the data
 We'll also plot some of the variables to get a feel for how they're distributed.
@@ -182,13 +93,14 @@ hist(dAll$MVPA_min_per_day, breaks=1000, xlim=c(0,300))
 #look at deciles
 quantile(dAll$MVPA_min_per_day, prob = seq(0.1, 0.9, by = 0.1), na.rm = TRUE)
 ```
+
 We can have a look at some of the machine-learned variables, to see if we believe them! Here we'll look at plots of probability of being in a particular behaviour by time of day:
 ```{r}
 plotAverageDay(dAll, "sleep.hourOfDay.", ".avg", "Sleep (probability)")
 
 ```
 
-Now let's look descriptively at something we might expect to vary as activity status varies: BMI.
+Now let's look descriptively at something we might expect to vary as activity status varies: BMI. This is just a descriptive plot i.e. it's not adjusted for any other behaviours. 
 
 ```{r}
 plotVarAndQuintile(dAll, # dataset
@@ -198,14 +110,11 @@ plotVarAndQuintile(dAll, # dataset
                   )
 ```
 
-
-You might want to extend this function to plot the different profiles of different groups (e.g. healthy/ unhealthy individuals, or age groups).
-
 # Run a simple health association analysis
+
 Let's run a minimally (age and sex) adjusted linear model for BMI, against fifths of average acceleration vector magnitude. This is attempting to model statistically the association we were looking at descriptively in the end of the last section.
 
 ```{r}
-dAll$acc_quintiles <- cut(dAll$acc.overall.avg, breaks = c(quantile(dAll$acc.overall.avg, probs = seq(0, 1, by = 0.2), na.rm = TRUE))) # cut at quintiles
 min_adj_lm_BMI <- lm(BMI ~acc_quintiles + broadAgeGroup+ sex, dAll)
 ```
 
@@ -230,7 +139,6 @@ Here we've looked at a very simple linear model. Next steps might be:
 - logistic regression for prevalent disease (use the `glm` function)
 - Cox regression for incident disease (see for example the `survival` package and the `coxph` function)
 
-
 # Getting started with Cox regression
 
 For example, here's an initial Cox regression analysis associating quintiles of overall acceleration with incident ischaemic heart disease.
@@ -247,7 +155,7 @@ death <- read.csv("../data_and_data_prep/death.txt",
            sep = "\t")
 death <- death[death$ins_index == 0, ]  #Keep just one record per participant (a very small number of participants have duplicate records)
 dAll$died <- 0
-dAll$died[dAll$eid %in% death$eid ] <- 1
+dAll$died[dAll$eid %in% death$eid ] <- 1 # Add an indicator for death
 dAll <- merge(dAll[, colnames(dAll)[colnames(dAll) != "date_of_death"]], death[, c("eid", "date_of_death")], by = "eid", all.x = TRUE)
 cat(sum(dAll$died), "participants died")
 
@@ -260,19 +168,21 @@ dAll$censoring[(dAll$died == 1)] <- pmin(dAll$censoring[dAll$died == 1], as.Date
 
 # Add follow up variable (censor date for participants without an event, event date for participants with an event)
 dAll$follow_up <- dAll$censoring
-dAll$follow_up[(dAll$ischaemic.heart.disease.incident == 1)] <-  pmin(as.Date(dAll$ischaemic.heart.disease[(dAll$ischaemic.heart.disease.incident == 1)], format = "%Y-%m-%d"), dAll$censoring[(dAll$ischaemic.heart.disease.incident == 1)])
+had_ihd <- dAll$ischaemic.heart.disease.incident == 1 # make indicator variable
+dAll$follow_up[had_ihd] <- pmin(as.Date(dAll$ischaemic.heart.disease[had_ihd], format = "%Y-%m-%d"), dAll$censoring[had_ihd])
 
 # Note event status at censoring (again, care taken as there are some instances of entries in the data after censoring)
 dAll$IHD_at_exit <- 0
-dAll$IHD_at_exit[(dAll$ischaemic.heart.disease.incident == 1) & (as.Date(dAll$ischaemic.heart.disease, format = "%Y-%m-%d") == dAll$follow_up)] <- 1
+dAll$IHD_at_exit[had_ihd & (as.Date(dAll$ischaemic.heart.disease, format = "%Y-%m-%d") == dAll$follow_up)] <- 1
 cat(sum(dAll$IHD_at_exit), " had incident hospital diagnosed ischaemic heart disease within the follow up period")
 
 # Calculate follow up time 
 dAll$fu_time <- as.numeric(difftime(dAll$follow_up, as.Date(dAll$EndTimWear, "%Y-%m-%d %H:%M:%S", tz = "Europe/London")))
 ```
-WARNING: when working with date data, especially when dates are only present for some participants, it is very easy to write code which behaves in strange ways... I did so several times when writing this example (and don't guarantee it's error-free now). It is well worth inspecting your data repeatedly to check that the code is doing what you expect. [Obviously not shown here as I can't print the data frame on the internet... Bear this in mind when using RMarkdown]. 
 
-We now have an event status indicator at exit and a follow-up time variable, which is enough to run a Cox model: 
+When working with date data, especially when dates are only present for some participants, it is very easy to write code which behaves in strange ways... I did so several times when writing this example (and don't guarantee it's error-free now). It is well worth inspecting your data repeatedly to check that the code is doing what you expect. [Obviously not shown here as I can't print the data frame on the internet... Bear this in mind when using RMarkdown]. 
+
+We now have an event status indicator at exit and a follow-up time variable, which is enough to run a Cox model (using the `survival` package in R): 
 ```{r}
 library(survival)
 cox_model <- coxph(Surv(fu_time, IHD_at_exit) ~ broadAgeGroup + sex + acc_quintiles, dAll)
