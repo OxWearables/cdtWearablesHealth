@@ -160,12 +160,13 @@ There are two other types of exclusions you may wish to make, depending on your 
 - Health-related exclusions. For example, if you are analysing incident disease, you may wish to exclude people who had prevalent disease at the time they wore the accelerometer. 
 - Missing covariate data. If small numbers of participants have missing data in covariates, you may wish to exclude them. (Alternatively, you could look into missing data imputation). 
 
-**Important:** You should record how many participants were excluded at each of the above steps. 
+**Important:** You should record how many participants were excluded at each of the above steps.
+
+**Watch out for NA values** Lots of the R code in these tutorials [will do some very weird things if you have `NA` values in variables](https://www.r-bloggers.com/2018/10/subsetting-in-the-presence-of-nas/). Have a look and check it's behaving as you expect. 
 
 # Preprocessing 
 
-As described above the data has had some rough preprocessing already performed, corresponding to use of the UK Biobank data dictionary to recode variables.
-However, this is automated and imperfect. For example, some numeric variables may have special values indicating missing data, which have not been automatically processed (an example is [fresh fruit intake](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=1309)).
+As described above the data has had some rough preprocessing already performed, corresponding to use of the UK Biobank data dictionary to recode variables. However, this is automated and imperfect. For example, some numeric variables may have special values indicating missing data, which have not been automatically processed (an example is [fresh fruit intake](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=1309)).
 
 Now is a good time to look at the variables you're planning to use in more detail, understand their distribution, recode any values you wish to recode, and change groupings as required. For example, the [ethnicity variable](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=21000) has many distinctions, some of which apply to very few participants, so you may wish to recode it for statistical analyses. Spending time understanding the data in detail now will not be wasted!
 
