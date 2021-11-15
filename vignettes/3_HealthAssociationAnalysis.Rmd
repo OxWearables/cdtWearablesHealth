@@ -3,7 +3,7 @@ title: "A Basic Health Association Analysis"
 pkgdown:
   as_is: true
 output: 
-  rmarkdown::html_vignette:
+  rmarkdown::html_document:
     number_sections: true
     toc: true
 vignette: >

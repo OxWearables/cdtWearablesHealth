@@ -1,8 +1,11 @@
 ---
 title: "Data Preparation"
+pkgdown:
+  as_is: true
 output: 
-  rmarkdown::html_vignette:
+  rmarkdown::html_document:
     number_sections: true
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Data Preparation}
   %\VignetteEngine{knitr::rmarkdown}
