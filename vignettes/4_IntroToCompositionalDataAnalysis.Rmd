@@ -1,8 +1,11 @@
 ---
 title: "Compositional Data Analysis Tutorial"
+pkgdown:
+  as_is: true
 output: 
   rmarkdown::html_vignette:
     number_sections: true
+    toc: true
 bibliography: library.bib
 vignette: >
   %\VignetteIndexEntry{Compositional Data Analysis Tutorial}

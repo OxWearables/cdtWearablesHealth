@@ -1,8 +1,11 @@
 ---
 title: "A Basic Health Association Analysis"
+pkgdown:
+  as_is: true
 output: 
   rmarkdown::html_vignette:
     number_sections: true
+    toc: true
 vignette: >
   %\VignetteIndexEntry{A Basic Health Association Analysis}
   %\VignetteEngine{knitr::rmarkdown}
@@ -32,7 +35,7 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(devtools, ggplot2, reshape2, data.table, table1)
 
 # Load helper functions
-source("R/utils.R")
+source("../R/utils.R")
 
 # We then load the data prepared in the last tutorial.
 # To do this with example data, replace the file location below with 
@@ -164,7 +167,8 @@ dAll$censoring <- as.Date("31/12/2020", format = "%d/%m/%Y")
 dAll$censoring[dAll$UkBiobankAssessCent %in% c("Cardiff", "Wrexham", "Swansea")] <- as.Date("28/02/2018", format = "%d/%m/%Y")
 
 # For people who died, we need to censor them at the earliest of their date of death and overall censoring (e.g. a participant in Wales who died in 2020 should nonetheless be # censored at 28.02.2018 - if they had an IHD event in 2019 we wouldn't know about it
-dAll$censoring[(dAll$died == 1)] <- pmin(dAll$censoring[dAll$died == 1], as.Date(dAll$date_of_death[dAll$died ==1], format = "%d/%m/%Y"))
+died <- (dAll$died == 1)
+dAll$censoring[died] <- pmin(dAll$censoring[died], as.Date(dAll$date_of_death[died], format = "%d/%m/%Y"))
 
 # Add follow up variable (censor date for participants without an event, event date for participants with an event)
 dAll$follow_up <- dAll$censoring
@@ -180,7 +184,7 @@ cat(sum(dAll$IHD_at_exit), " had incident hospital diagnosed ischaemic heart dis
 dAll$fu_time <- as.numeric(difftime(dAll$follow_up, as.Date(dAll$EndTimWear, "%Y-%m-%d %H:%M:%S", tz = "Europe/London")))
 ```
 
-When working with date data, especially when dates are only present for some participants, it is very easy to write code which behaves in strange ways... I did so several times when writing this example (and don't guarantee it's error-free now). It is well worth inspecting your data repeatedly to check that the code is doing what you expect. [Obviously not shown here as I can't print the data frame on the internet... Bear this in mind when using RMarkdown]. 
+When working with date data, especially when dates are only present for some participants, it is very easy to write code which behaves in strange ways... I did so several times when writing this example (and don't guarantee it's error-free now). It is well worth inspecting your data repeatedly to check that the code is doing what you expect. This is obviously not shown here as I can't print the data frame on the internet... Bear this in mind when using RMarkdown.
 
 We now have an event status indicator at exit and a follow-up time variable, which is enough to run a Cox model (using the `survival` package in R): 
 ```{r}

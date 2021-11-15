@@ -1,8 +1,11 @@
---
+---
 title: "Getting Set Up With RStudio"
+pkgdown:
+  as_is: true
 output: 
   rmarkdown::html_vignette:
     number_sections: true
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Getting Set Up With RStudio}
   %\VignetteEngine{knitr::rmarkdown}
@@ -33,14 +36,3 @@ ssh -L 8787:localhost:8787 username@vm.bmrc.ox.ac.uk
 ```
 Finally, navigate to http://localhost:8787 in your browser. 
 
-
-# Using functions
-To run all the analyses here, you will need to use some functions in this R package. This repository is structured as an R package, so the easiest way to use these functions is to install and load the package:
-
-```{r, eval=FALSE}
-install.packages("devtools")
-library(devtools)
-devtools::install_github("activityMonitoring/week2DataChallenge", ref = "main")
-library(week2DataChallenge)
-```
-Alternatively, you can download and run the script R/utils.R in your R session.
