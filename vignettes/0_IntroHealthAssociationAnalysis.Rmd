@@ -78,7 +78,7 @@ Working with death data, we might be interested in a time-to-event outcome and s
 
 Can we address confounding by adjusting for possible confounders? Can we assess impact of reverse causality (e.g. by excluding a period of follow-up)? 
 
-**Cause** is probably the single most controversial word in epidemiology. Here, we're interested in understanding causal effects. But, the data is observational and observational data is known to be subject to a lot of potential biases. This means people usually avoid causal language in describing observational results, while still using methods to attempt to get at causality (although [whether this is the right approach is controversial](https://ajph.aphapublications.org/doi/10.2105/AJPH.2018.304337)).
+**Cause** is probably the single most controversial word in epidemiology. Here, we're interested in understanding causal effects. But, the data is observational and observational data is known to be subject to a lot of potential biases. This means people usually avoid causal language in describing observational results, while still using methods to attempt to get at causality (although [whether we should entirely avoid this language is controversial](https://ajph.aphapublications.org/doi/10.2105/AJPH.2018.304337)).
 
 
 

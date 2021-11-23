@@ -39,7 +39,7 @@ plot_var_and_quintile <- function(data, exposure, outcome) {
 #' @param y_label Label for y-axis
 #' @return Plot of behaviour variable over hours of day
 #' @export
-plotAverageDay <-
+plot_average_day <-
   function(data,
            exposure_prefix,
            exposure_suffix,

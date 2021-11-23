@@ -31,7 +31,7 @@ This tutorial contains:
 9. 	Finding out more 
 
 # Troubleshooting 
-If nothing is working, speak to Rosemary – rosemary.walmsley@gtc.ox.ac.uk. If needed, we have pre-processed data you can use.
+If something is not working, speak to Rosemary – rosemary.walmsley@gtc.ox.ac.uk. 
 
 # Introduction to available data
 Different files are available from UK Biobank for different data types. We will use these files, available under `/cdtshared/wearables/health_data_files`: 
@@ -157,7 +157,7 @@ There are two other types of exclusions you may wish to make, depending on your 
 - Health-related exclusions. For example, if you are analysing incident disease, you may wish to exclude people who had prevalent disease at the time they wore the accelerometer. 
 - Missing covariate data. If small numbers of participants have missing data in covariates, you may wish to exclude them. (Alternatively, you could look into missing data imputation). 
 
-**Important:** You should record how many participants were excluded at each of the above steps. 
+**Important:** You should record how many participants were excluded at each of the above steps. Usually, studies present a [flow diagram](https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0040297) (see point 13c) to be precise about which groups of participants were left out and why. 
 
 # Preprocessing 
 
@@ -173,14 +173,21 @@ One thing you will need to do is add an age-at-accelerometer-wear variable. Here
 # ADD DATE OF BIRTH
 df$approx_dob <-
   as.Date(paste(df$YearOfBirth, df$MonthOfBirth, "15", sep = "-"),
-          "%Y-%B-%d")
+          "%Y-%B-%d") # UK Biobank doesn't contain day of birth as it would be unnecessary identifying information, so we impute it as the 15th of the birth month. 
 
+# ENSURE DATES FORMATTED CORRECTLY
+df$end_accel_wear <- as.Date(df$EndTimWear, "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
+
+# ADD AGE AT ENTRY IN DAYS
 df$age_entry_days <-
-  difftime(as.Date(df$EndTimWear, "%Y-%m-%d %H:%M:%S", tz = "Europe/London"), 
+  difftime(df$end_accel_wear, 
            df$approx_dob,
            units = "days")
 
+# CONVERT TO AGE AT ENTRY IN YEARS
 df$age_entry_years <- as.numeric(df$age_entry_days)/365.25
+
+# ADD AGE GROUPS
 df$broadAgeGroup <- cut(df$age_entry_years, breaks = c(40, 50, 60, 70, 80 ), right = FALSE, labels = c("40-49", "50-59", "60-69", "70-79"))
 
 ```
@@ -197,4 +204,4 @@ To find out more about UK Biobank data collection and history, [this](https://jo
 
 In addition to what we’ve shared here, UK Biobank is an open resource and several other open-source tools are available to support its use ([an example](https://git.fmrib.ox.ac.uk/fsl/funpack))
 
-UK Biobank is currently moving to an [Amazon Web Services model](https://www.ukbiobank.ac.uk/learn-more-about-uk-biobank/news/uk-biobank-creates-cloud-based-health-data-analysis-platform-to-unleash-the-imaginations-of-the-world-s-best-scientific-minds).
+UK Biobank is currently moving to an [Amazon Web Services model](https://www.ukbiobank.ac.uk/learn-more-about-uk-biobank/news/uk-biobank-creates-cloud-based-health-data-analysis-platform-to-unleash-the-imaginations-of-the-world-s-best-scientific-minds). In the future, this will likely represent the best way to access UK Biobank data. 
