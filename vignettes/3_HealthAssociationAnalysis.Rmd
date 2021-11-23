@@ -160,6 +160,7 @@ death <- death[death$ins_index == 0, ]  #Keep just one record per participant (a
 df$died <- 0
 df$died[df$eid %in% death$eid ] <- 1 # Add an indicator for death
 df <- merge(df[, colnames(df)[colnames(df) != "date_of_death"]], death[, c("eid", "date_of_death")], by = "eid", all.x = TRUE)
+df$date_of_death <- as.Date(df$date_of_death, format = "%d/%m/%Y") # Format as date
 cat(sum(df$died), "participants died")
 
 # Note censoring dates of 31.12.20 in England/Scotland and 28.02.2018 in Wales (https://biobank.ndph.ox.ac.uk/ukb/exinfo.cgi?src=Data_providers_and_dates) 
@@ -168,7 +169,7 @@ df$censoring[df$UkBiobankAssessCent %in% c("Cardiff", "Wrexham", "Swansea")] <- 
 
 # For people who died, we need to censor them at the earliest of their date of death and overall censoring (e.g. a participant in Wales who died in 2020 should nonetheless be # censored at 28.02.2018 - if they had an IHD event in 2019 we wouldn't know about it
 died <- (df$died == 1)
-df$censoring[died] <- pmin(df$censoring[died], as.Date(df$date_of_death[died], format = "%d/%m/%Y"))
+df$censoring <- pmin(df$censoring[died], df$date_of_death[died])
 
 # Add follow up variable (censor date for participants without an event, event date for participants with an event)
 df$follow_up <- df$censoring
