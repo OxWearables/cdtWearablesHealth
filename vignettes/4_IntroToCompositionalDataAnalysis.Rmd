@@ -1,5 +1,5 @@
 ---
-title: "Compositional Data Analysis Tutorial"
+title: "Compositional Data Analysis Tutorial (Optional)"
 pkgdown:
   as_is: true
 output: 
@@ -23,7 +23,6 @@ knitr::opts_chunk$set(
 ```{r setup, eval = FALSE}
 install.packages("ggplot2") # Plotting works better with ggplot2
 install.packages("devtools") # To install epicoda from GitHub, the devtools package is required.
-library(devtools)
 devtools::install_github("activityMonitoring/epicoda",  build_opts = c("--no-resave-data"), build_vignettes = TRUE, build_manual = TRUE) # TROUBLESHOOTING if this doesn't work, use build_vignettes = FALSE. You have the info from the vignette here!
 ```
 
@@ -37,6 +36,8 @@ library(ggplot2)
 This tutorial is an optional additional tutorial on Compositional Data Analysis for movement behaviour data. Compositional Data Analysis is an approach to the analysis of compositional data which has become increasingly popular in movement behaviour epidemiology in recent years. This tutorial illustrates some steps of an epidemiological analysis with a compositional exposure. It uses a package, `epicoda`, we have developed for this purpose. More information about any function we use can be found by running `?function_name` (as usual). Please note that the package is under active development, and has been tested in a limited range of scenarios, so you may well find bugs. If you do, or if anything isn't clear, please do get in touch! (rosemary.walmsley@gtc.ox.ac.uk)
 
 This tutorial is closely based on one of the package vignettes... Which was itself based on an earlier version of this tutorial!
+
+It is highly recommended to deal with missing data both in compositional variables and in covariate or outcome data prior to using the package: functions were designed assuming complete data and may not behave predictably where data is not complete.
 
 ## Getting started with compositional data
 
@@ -94,8 +95,8 @@ comp_mean(data = simdata, # this is the dataset
           rounded_zeroes = TRUE, # this option specifies that we'll treat the zeroes
           # as rounded zeroes i.e. we'll impute them
           det_limit = 0.0012, # this is the smallest value observable in the data
-          units = "hr/day" # this is the units. There are pre-specified options "hr/day",
-          # "hr/wk", "min/day", "min/wk" and "unitless".
+          units = "hr/day" # this is the units for the output. There are pre-specified options
+          # "hr/day", "hr/wk", "min/day", "min/wk" and "unitless".
           # If you set units = "specified", you can also specify your own units using
           # specified = c("my_units_name", sum of a composition in these units)
 )
@@ -150,8 +151,8 @@ tab_coefs(scale_type = "lp", # This argument can be "lp" or "exp" and determines
 * Arguments which would be needed for `comp_model` must be given to this function too, as it regenerates the regression models.
 * The function `tab_covariate_coefs` is called within this function, and can be used to extract the coefficients of the covariates only from a model.
 
-### Presenting the results:  substitution plots
-Substitution plots show the model-estimated difference in the outcome (relative to at the compositional mean) as the balance between two parts of the composition varies. In the case of time use/movement behaviours, they are known as isotemporal substitution plots and show the model-estimated difference in the outcome at higher time in one behaviour at the expense of time in another behaviour (the model-estimated difference in outcome for a hypothetical reallocation of time from one behaviour to another). For example:
+### Presenting the results: reallocation plots
+Substitution or reallocation plots show the model-estimated difference in the outcome (relative to at the compositional mean) as the balance between two parts of the composition varies. In the case of time use/movement behaviours, they are sometimes described as isotemporal substitution plots and show the model-estimated difference in the outcome at higher time in one behaviour at the expense of time in another behaviour (the model-estimated difference in outcome for a hypothetical reallocation of time from one behaviour to another). For example:
 
 ```{r}
 plot_transfers(from_part = "sedentary",
@@ -204,6 +205,15 @@ We now need to plot these, which can be done as follows.
 forest_plot_comp(composition_list = list_for_plot,
                  model = lm_BMI,
                  comp_labels = c("vigorous", "moderate", "light", "sedentary", "sleep"))
+```
+Please note that on the plot with `terms = TRUE` the reference is always the compositional mean *in the dataset used to create the model*. This will agree with the compositional mean calculated above and which we calculated perturbations relative to if there is no missing data in the dataset used to create the model. To check this, there's a utility function in the package to get the compositional mean directly from the model (although it's a bit ugly): 
+```{r}
+# Set up of the function means it uses this internal from the modelling. Hopefully will be streamlined in future... : 
+tl_for_check <- transf_labels(comp_labels  = c("vigorous", "moderate", "light", "sedentary", "sleep"), transformation_type = "ilr") 
+ # The comp mean calculated from the model: 
+get_cm_from_model(lm_BMI, comp_labels = c("vigorous", "moderate", "light", "sedentary", "sleep"), transf_labels = tl_for_check)$cm
+# The comp mean calculated above transformed to unitless scale: 
+df/24 
 ```
 
 The `forest_plot_comp` function can also be used to compare models. To do this, leave `model` at its default `NULL` value, and set `models_list` as a named list of models. For example, to compare `lm_BMI` with a model adjusted for `age_group` only and an unadjusted model (very boring in the simulated data because the correlation structure for the simulation wasn't sufficiently rich!):
@@ -262,7 +272,7 @@ plot_transfers(from_part = "sedentary",
 
 #### Notes
 * The predictions and confidence intervals on this plot capture the predictions and uncertainty on them due to all variables in the model, including the covariates at the set fixed values.
-* The `fixed_values` argument can be used to set the values at which covariates (but not compositional variables) are fixed (which if not set default to median or modal values for continuous and categorical variables respectively)
+* The `fixed_values` argument can be used to set the values at which covariates (but not compositional variables) are fixed (which if not set default to mean or modal values for continuous and categorical variables respectively)
 * Other functions, such as `forest_plot_comp`, can also output predictions by setting `terms = FALSE`.
 
 ### Customising plots
