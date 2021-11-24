@@ -35,7 +35,7 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(ggplot2, data.table, table1, survival, scales)
 
 # Load helper functions
-source("R/utils.R")
+source("../R/utils.R")
 ```
 
 We then load the data prepared in the last tutorial.
@@ -63,7 +63,8 @@ for (variable in behaviour_vars){
   df[, paste0(variable, "_hr_per_day")] <- 24*df[, variable]
 }
 
-df$acc_quintiles <- cut(df$acc.overall.avg, breaks = quantile(df$acc.overall.avg, probs = seq(0, 1, by = 0.2), na.rm = TRUE)) # cut at quintiles
+df$acc_quintiles <- cut(df$acc.overall.avg, breaks = quantile(df$acc.overall.avg, probs = seq(0, 1, by = 0.2), na.rm = TRUE), labels = paste0("Q", 1:5), include.lowest = TRUE) # cut at quintiles
+df$acc_quintiles_numeric <- cut(df$acc.overall.avg, breaks = quantile(df$acc.overall.avg, probs = seq(0, 1, by = 0.2), na.rm = TRUE), include.lowest = TRUE) # cut at quintiles
 ```
 
 #  Describe and explore the data
@@ -79,7 +80,7 @@ The following code constructs a table to describe participant characteristics by
 We are cheating a bit here by using a package that generates a nicely formatted table. You can of course write your own code to make a table of what you're interested in. 
 
 ```{r table}
-table1::table1(~ sex + broadAgeGroup + ethnicity + smoking | acc_quintiles, data=df)
+table1::table1(~ sex + broadAgeGroup + ethnicity + smoking | acc_quintiles_numeric, data=df)
 ```
 
 ## Plots to describe the data
@@ -162,7 +163,7 @@ death <-
   death[death$ins_index == 0,]  # Keep just one record per participant (a very small number of participants have duplicate records)
 
 # Format date data
-death$date_of_death <- as.Date(df$date_of_death, format = "%d/%m/%Y")
+death$date_of_death <- as.Date(death$date_of_death, format = "%d/%m/%Y")
 
 # Add a death indicator
 df$died <- 0
@@ -200,7 +201,8 @@ df$IHD_at_exit[had_ihd & (df$ischaemic.heart.disease == df$follow_up)] <-  1
 cat(sum(df$IHD_at_exit)," had incident hospital diagnosed ischaemic heart disease within the follow up period")
 
 # Calculate follow up time
-df$fu_time <- as.numeric(difftime(df$follow_up, df$end_accel_wear))
+df$end_accel_wear <- as.Date(df$EndTimWear, "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
+df$fu_time <- as.numeric(difftime(df$follow_up, df$EndTimWear))
 ```
 
 When working with date data, especially when dates are only present for some participants, it is very easy to write code which behaves in strange ways... I did so several times when writing this example (and don't guarantee it's error-free now). It is well worth inspecting your data repeatedly to check that the code is doing what you expect. This is not shown here as I can't print the data frame on the internet...(Bear this in mind when using RMarkdown!) 
@@ -214,29 +216,38 @@ The `exp(coef)` column gives the hazard ratio. Not surprisingly, older age and m
 
 We could plot the results: 
 ```{r}
-data_for_plot <- summary(cox_model)$conf.int
+data_for_plot <- as.data.frame(summary(cox_model)$conf.int)
 colnames(data_for_plot) <- c("HR", "ignore", "lower_CI", "upper_CI")
 data_for_plot$var_name <- rownames(data_for_plot)
 
 ncoef <- nrow(data_for_plot)
-data_for_plot <- data_for_plot[(ncoef - 4):ncoef, ]
+data_for_plot <- data_for_plot[(ncoef - 3):ncoef,]
 
-ref_row <-  data.frame("var_name" = "Reference: Lowest fifth of acceleration", "HR" =1,  "ignore" = "ignore", "lower_CI"= 1, "upper_CI"  =1)
+ref_row <-
+  data.frame(
+    "var_name" = "Q1",
+    "HR" = 1,
+    "ignore" = "ignore",
+    "lower_CI" = 1,
+    "upper_CI"  = 1
+  )
 data_for_plot <- rbind(ref_row, data_for_plot)
+data_for_plot$quintile <- gsub("acc_quintiles", "", data_for_plot$var_name)
+data_for_plot$event_number <- sapply(as.factor(data_for_plot$quintile), function(x) sum(df$IHD_at_exit[df$acc_quintiles == x]))
 
-ggplot(data_for_plot, aes(x = "HR", y = "var_name")) + geom_point() + geom_errorbar(aes(xmin = lower_CI, xmax = upper_CI), width = 0) + geom_vline(xintercept = 1) + scales::scale_x_continuous(trans = "log")
+ggplot(data_for_plot, aes(x = HR, y = quintile)) + geom_point(aes(size = event_number), shape = 15) + geom_errorbar(aes(xmin = lower_CI, xmax = upper_CI), width = 0, size = 1) + geom_vline(xintercept = 1) + scale_x_continuous(trans = "log") + theme_classic() + labs(title = "Association of activity with incident IHD", y = "Quintile of average acceleration") + theme(axis.line.y = element_blank()) + scale_y_discrete(limits=rev)
 ```
 
 ## Next steps
 Again, there's lots you could do to build on and refine this example: 
 
 - it would be good to adjust for other possible confounders.
-- you might want to look into model diagnostics to understand if assumptions, such as the [proportional hazards assumption](https://thomaselove.github.io/432-notes/cox-regression-models-for-survival-data-example-1.html) (see section 23.2.5 and 23.2.6).
+- you might want to look into model diagnostics to understand whether assumptions hold. An example is the [proportional hazards assumption](https://thomaselove.github.io/432-notes/cox-regression-models-for-survival-data-example-1.html) (see section 23.2.5 and 23.2.6).
 - you would probably want to refine the outcome definition. Currently, we've only considered admission to hospital with ischaemic heart disease as an endpoint. What about ischaemic heart disease events recorded only on the death register? You could add these using the information in `death_cause.txt`.
-- you could also refine the outcome definition by refining the set of ICD-10 codes you use to identify
+- you could also refine the outcome definition by refining the set of ICD-10 codes you use to identify the disease. 
 - here, we've excluded people who have prevalent disease recorded in hospital. What about people who [self-reported prevalent disease at the UK Biobank baseline assessment](https://biobank.ndph.ox.ac.uk/showcase/field.cgi?id=6150)? 
-- you might want to consider some **sensitivity analyses**. For example, [could the association be driven by participants who have reduced their activity due to poor health](https://pubmed.ncbi.nlm.nih.gov/32472927/)? How could you assess that? 
-- A bonus: here we've adjusted the model for baseline age (in fact, in very crude groups) and used time-on-study as the timescale in the Cox regression analysis. This is what most introductory texts do. However, in epidemiological studies, time-on-study might not be the most relevant timescale. [Age might be a more appropriate timescale...](https://journals.lww.com/epidem/Fulltext/2012/07000/Proportional_Hazards_Regression_in_Epidemiologic.9.aspx)
+- you might want look at **sensitivity analyses**. For example, [could the association be driven by participants who have reduced their activity due to poor health](https://pubmed.ncbi.nlm.nih.gov/32472927/)? How could you assess that? 
+- this model is probably under-adjusted for age: age is the major determinant of IHD risk, and here we've adjusted for baseline age in very crude groups. A first step would be to use more granular groups or a continuous term. A bonus: we've adjusted for baseline age and used time-on-study as the timescale in the Cox regression analysis. This is what most introductory texts do. However, in epidemiological studies, time-on-study might not be the most relevant timescale. [We could use age as the timescale instead...](https://journals.lww.com/epidem/Fulltext/2012/07000/Proportional_Hazards_Regression_in_Epidemiologic.9.aspx)
 
 
 Have fun! :) 

@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compositional Data Analysis Tutorial • week2DataChallenge</title>
+<title>Compositional Data Analysis Tutorial (Optional) • week2DataChallenge</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Compositional Data Analysis Tutorial">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Compositional Data Analysis Tutorial (Optional)">
 <meta property="og:description" content="week2DataChallenge">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -66,7 +66,7 @@
       <a href="../articles/3_HealthAssociationAnalysis.html">A Basic Health Association Analysis</a>
     </li>
     <li>
-      <a href="../articles/4_IntroToCompositionalDataAnalysis.html">Compositional Data Analysis Tutorial</a>
+      <a href="../articles/4_IntroToCompositionalDataAnalysis.html">Compositional Data Analysis Tutorial (Optional)</a>
     </li>
   </ul>
 </li>
@@ -95,7 +95,7 @@
 <script src="4_IntroToCompositionalDataAnalysis_files/navigation-1.1/tabsets.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Compositional Data Analysis Tutorial</h1>
+      <h1 data-toc-skip>Compositional Data Analysis Tutorial (Optional)</h1>
             
       
       
@@ -108,7 +108,6 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"ggplot2"</span><span class="op">)</span> <span class="co"># Plotting works better with ggplot2</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span> <span class="co"># To install epicoda from GitHub, the devtools package is required.</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/">devtools</a></span><span class="op">)</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"activityMonitoring/epicoda"</span>,  build_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"--no-resave-data"</span><span class="op">)</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span>, build_manual <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># TROUBLESHOOTING if this doesn't work, use build_vignettes = FALSE. You have the info from the vignette here!</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">epicoda</span><span class="op">)</span>
@@ -118,6 +117,7 @@
 <a href="#a-basic-analysis" class="anchor"></a><span class="header-section-number">1</span> A basic analysis</h1>
 <p>This tutorial is an optional additional tutorial on Compositional Data Analysis for movement behaviour data. Compositional Data Analysis is an approach to the analysis of compositional data which has become increasingly popular in movement behaviour epidemiology in recent years. This tutorial illustrates some steps of an epidemiological analysis with a compositional exposure. It uses a package, <code>epicoda</code>, we have developed for this purpose. More information about any function we use can be found by running <code>?function_name</code> (as usual). Please note that the package is under active development, and has been tested in a limited range of scenarios, so you may well find bugs. If you do, or if anything isn’t clear, please do get in touch! (<a href="mailto:rosemary.walmsley@gtc.ox.ac.uk" class="email">rosemary.walmsley@gtc.ox.ac.uk</a>)</p>
 <p>This tutorial is closely based on one of the package vignettes… Which was itself based on an earlier version of this tutorial!</p>
+<p>It is highly recommended to deal with missing data both in compositional variables and in covariate or outcome data prior to using the package: functions were designed assuming complete data and may not behave predictably where data is not complete.</p>
 <div id="getting-started-with-compositional-data" class="section level2" number="1.1">
 <h2 class="hasAnchor">
 <a href="#getting-started-with-compositional-data" class="anchor"></a><span class="header-section-number">1.1</span> Getting started with compositional data</h2>
@@ -199,8 +199,8 @@
           rounded_zeroes <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># this option specifies that we'll treat the zeroes</span>
           <span class="co"># as rounded zeroes i.e. we'll impute them</span>
           det_limit <span class="op">=</span> <span class="fl">0.0012</span>, <span class="co"># this is the smallest value observable in the data</span>
-          units <span class="op">=</span> <span class="st">"hr/day"</span> <span class="co"># this is the units. There are pre-specified options "hr/day",</span>
-          <span class="co"># "hr/wk", "min/day", "min/wk" and "unitless".</span>
+          units <span class="op">=</span> <span class="st">"hr/day"</span> <span class="co"># this is the units for the output. There are pre-specified options</span>
+          <span class="co"># "hr/day", "hr/wk", "min/day", "min/wk" and "unitless".</span>
           <span class="co"># If you set units = "specified", you can also specify your own units using</span>
           <span class="co"># specified = c("my_units_name", sum of a composition in these units)</span>
 <span class="op">)</span>
@@ -357,10 +357,10 @@
 </ul>
 </div>
 </div>
-<div id="presenting-the-results-substitution-plots" class="section level3" number="1.3.4">
+<div id="presenting-the-results-reallocation-plots" class="section level3" number="1.3.4">
 <h3 class="hasAnchor">
-<a href="#presenting-the-results-substitution-plots" class="anchor"></a><span class="header-section-number">1.3.4</span> Presenting the results: substitution plots</h3>
-<p>Substitution plots show the model-estimated difference in the outcome (relative to at the compositional mean) as the balance between two parts of the composition varies. In the case of time use/movement behaviours, they are known as isotemporal substitution plots and show the model-estimated difference in the outcome at higher time in one behaviour at the expense of time in another behaviour (the model-estimated difference in outcome for a hypothetical reallocation of time from one behaviour to another). For example:</p>
+<a href="#presenting-the-results-reallocation-plots" class="anchor"></a><span class="header-section-number">1.3.4</span> Presenting the results: reallocation plots</h3>
+<p>Substitution or reallocation plots show the model-estimated difference in the outcome (relative to at the compositional mean) as the balance between two parts of the composition varies. In the case of time use/movement behaviours, they are sometimes described as isotemporal substitution plots and show the model-estimated difference in the outcome at higher time in one behaviour at the expense of time in another behaviour (the model-estimated difference in outcome for a hypothetical reallocation of time from one behaviour to another). For example:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/plot_transfers.html">plot_transfers</a></span><span class="op">(</span>from_part <span class="op">=</span> <span class="st">"sedentary"</span>,
                to_part <span class="op">=</span> <span class="st">"moderate"</span>,
@@ -440,8 +440,20 @@
                  comp_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"vigorous"</span>, <span class="st">"moderate"</span>, <span class="st">"light"</span>, <span class="st">"sedentary"</span>, <span class="st">"sleep"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
 <pre><code>#&gt; GRID.VP.11::forestplot_margins</code></pre>
-<p>The <code>forest_plot_comp</code> function can also be used to compare models. To do this, leave <code>model</code> at its default <code>NULL</code> value, and set <code>models_list</code> as a named list of models. For example, to compare <code>lm_BMI</code> with a model adjusted for <code>age_group</code> only and an unadjusted model (very boring in the simulated data because the correlation structure for the simulation wasn’t sufficiently rich!):</p>
+<p>Please note that on the plot with <code>terms = TRUE</code> the reference is always the compositional mean <em>in the dataset used to create the model</em>. This will agree with the compositional mean calculated above and which we calculated perturbations relative to if there is no missing data in the dataset used to create the model. To check this, there’s a utility function in the package to get the compositional mean directly from the model (although it’s a bit ugly):</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Set up of the function means it uses this internal from the modelling. Hopefully will be streamlined in future... : </span>
+<span class="va">tl_for_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/transf_labels.html">transf_labels</a></span><span class="op">(</span>comp_labels  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"vigorous"</span>, <span class="st">"moderate"</span>, <span class="st">"light"</span>, <span class="st">"sedentary"</span>, <span class="st">"sleep"</span><span class="op">)</span>, transformation_type <span class="op">=</span> <span class="st">"ilr"</span><span class="op">)</span> 
+ <span class="co"># The comp mean calculated from the model: </span>
+<span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/get_cm_from_model.html">get_cm_from_model</a></span><span class="op">(</span><span class="va">lm_BMI</span>, comp_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"vigorous"</span>, <span class="st">"moderate"</span>, <span class="st">"light"</span>, <span class="st">"sedentary"</span>, <span class="st">"sleep"</span><span class="op">)</span>, transf_labels <span class="op">=</span> <span class="va">tl_for_check</span><span class="op">)</span><span class="op">$</span><span class="va">cm</span>
+<span class="co">#&gt;       vigorous   moderate     light sedentary     sleep</span>
+<span class="co">#&gt; 1 0.0003677937 0.06264286 0.1478071 0.4227189 0.3664634</span>
+<span class="co"># The comp mean calculated above transformed to unitless scale: </span>
+<span class="va">df</span><span class="op">/</span><span class="fl">24</span> 
+<span class="co">#&gt;       vigorous   moderate     light sedentary     sleep</span>
+<span class="co">#&gt; 1 0.0003677937 0.06264286 0.1478071 0.4227189 0.3664634</span></code></pre></div>
+<p>The <code>forest_plot_comp</code> function can also be used to compare models. To do this, leave <code>model</code> at its default <code>NULL</code> value, and set <code>models_list</code> as a named list of models. For example, to compare <code>lm_BMI</code> with a model adjusted for <code>age_group</code> only and an unadjusted model (very boring in the simulated data because the correlation structure for the simulation wasn’t sufficiently rich!):</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lm_BMI_unadjusted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/comp_model.html">comp_model</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"linear"</span>,
          outcome <span class="op">=</span> <span class="st">"BMI"</span>,
          data <span class="op">=</span> <span class="va">simdata</span>,
@@ -466,7 +478,7 @@
                                     <span class="st">"Age-adjusted"</span> <span class="op">=</span> <span class="va">lm_BMI_age_group_only</span>,
                                     <span class="st">"Age- and sex- adjusted"</span> <span class="op">=</span> <span class="va">lm_BMI</span><span class="op">)</span>,
                  comp_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"vigorous"</span>, <span class="st">"moderate"</span>, <span class="st">"light"</span>, <span class="st">"sedentary"</span>, <span class="st">"sleep"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
+<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
 <pre><code>#&gt; GRID.VP.14::forestplot_margins</code></pre>
 </div>
 </div>
@@ -488,7 +500,7 @@
 <p>The functions above wrap all the ‘log-ratio mechanics’ of using a Compositional Data Analysis approach.</p>
 <p>There are several different kinds of transformations which can be used in order to work with compositional data (alr, ilr, clr). These transform the variables into coordinates which are capable of representing all the variation in the data. Different transformations have different pros/cons, and alr and clr can only be used for certain applications. All the functions default to ilr (isometric log ratio) transformation using so-called ‘pivot coordinates,’ which is fairly standard in the time use/movement behaviour literature (and is appropriate for the applications which the other transformations are used for). If you want to learn more, see <span class="citation">(Filzmoser, Hron, and Templ 2018)</span><span class="citation">(Pawlowsky-Glahn, Egozcue, and Tolosana-Delgado 2011)</span>.</p>
 <p>The purpose of this package is not to provide this functionality, which is implemented in other R packages, such as <code>compositions</code> and <code>robCompositions</code>. (The main aim of this package is shown above, in the functions to perform standard epidemiological analyses). This functionality is reimplemented here simply to ensure that future changes to the defaults in those packages do not affect this package.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">data_ilr_impute_zeroes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/transform_comp.html">transform_comp</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">simdata</span>,
                                    comp_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"vigorous"</span>, <span class="st">"moderate"</span>, <span class="st">"light"</span>, <span class="st">"sedentary"</span>, <span class="st">"sleep"</span><span class="op">)</span>,
                                    transformation_type <span class="op">=</span> <span class="st">"ilr"</span><span class="op">)</span>
@@ -532,7 +544,7 @@
 <h3 class="hasAnchor">
 <a href="#presenting-results-via-model-predictions" class="anchor"></a><span class="header-section-number">1.4.2</span> Presenting results via model predictions</h3>
 <p>An alternative way to get round the challenges of interpreting the model coefficients for these models is to look at model-predicted outcomes for different input variable values (rather than model-estimated differences). The <code>plot_transfers</code> function can do this (for linear, logistic and Cox regression models) by setting <code>terms = FALSE</code>:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/plot_transfers.html">plot_transfers</a></span><span class="op">(</span>from_part <span class="op">=</span> <span class="st">"sedentary"</span>,
                to_part <span class="op">=</span> <span class="st">"moderate"</span>,
                model <span class="op">=</span> <span class="va">lm_BMI</span> ,
@@ -545,14 +557,18 @@
 <span class="co">#&gt; [1] "light : 3.5 hr/day"</span>
 <span class="co">#&gt; [1] "sleep : 8.8 hr/day"</span>
 <span class="co">#&gt; fixed_values will be updated to have compositional parts fixed at the compositional mean. For technical and pragmatic reasons, use of a different reference for the compositional parts is not currently possible.</span>
-<span class="co">#&gt; Please note that plotting may take some time.</span></code></pre></div>
-<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
+<span class="co">#&gt; Note that the confidence intervals on these predictions include uncertainty driven by other, non-compositional variables. To look at compositional variables only, use terms = TRUE</span>
+<span class="co">#&gt; [1] "Covariate values were fixed at: "</span>
+<span class="co">#&gt; [1] "agegroup : Middle"</span>
+<span class="co">#&gt; Please note that plotting may take some time.</span>
+<span class="co">#&gt; Warning: Removed 1 rows containing missing values (geom_hline).</span></code></pre></div>
+<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-16-1.png" width="672"></p>
 <div id="notes-3" class="section level4" number="1.4.2.1">
 <h4 class="hasAnchor">
 <a href="#notes-3" class="anchor"></a><span class="header-section-number">1.4.2.1</span> Notes</h4>
 <ul>
 <li>The predictions and confidence intervals on this plot capture the predictions and uncertainty on them due to all variables in the model, including the covariates at the set fixed values.</li>
-<li>The <code>fixed_values</code> argument can be used to set the values at which covariates (but not compositional variables) are fixed (which if not set default to median or modal values for continuous and categorical variables respectively)</li>
+<li>The <code>fixed_values</code> argument can be used to set the values at which covariates (but not compositional variables) are fixed (which if not set default to mean or modal values for continuous and categorical variables respectively)</li>
 <li>Other functions, such as <code>forest_plot_comp</code>, can also output predictions by setting <code>terms = FALSE</code>.</li>
 </ul>
 </div>
@@ -568,7 +584,7 @@
 <li>For <code>plot_transfers</code>, if the line looks ‘gappy’ (likely at the ends), increase <code>granularity</code> (and if it takes too long to plot, decrease <code>granularity</code>).</li>
 </ul>
 <p>For an extreme example of implementing some of this:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span> <span class="co"># it's easier to specify e.g. themes if ggplot2 is loaded.</span>
 <span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/plot_transfers.html">plot_transfers</a></span><span class="op">(</span>from_part <span class="op">=</span> <span class="st">"sedentary"</span>,
                to_part <span class="op">=</span> <span class="st">"moderate"</span>,
@@ -587,9 +603,9 @@
 <span class="co">#&gt; [1] "sleep : 8.8 hr/day"</span>
 <span class="co">#&gt; fixed_values will be updated to have compositional parts fixed at the compositional mean. For technical and pragmatic reasons, use of a different reference for the compositional parts is not currently possible.</span>
 <span class="co">#&gt; Please note that plotting may take some time.</span></code></pre></div>
-<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-16-1.png" width="672"></p>
+<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-17-1.png" width="672"></p>
 <p>Slightly differently, <code>forest_plot_comp</code> is based on the <code>forestplot</code> package, so takes arguments specifying the plot in the same way as that function. There are several arguments which set particular aspects of the forest plot. In addition, any argument that the basic <code>forestplot</code> function can take, which isn’t already set, can be set as an argument to <code>forest_plot_comp</code>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://gforge.se/packages/">forestplot</a></span><span class="op">)</span> <span class="co"># it's easier to specify options such as fpColors if the forestplot package is loaded.</span>
 <span class="co">#&gt; Loading required package: grid</span>
 <span class="co">#&gt; Loading required package: magrittr</span>
@@ -601,7 +617,7 @@
                  title <span class="op">=</span> <span class="st">"Analysis of physical behaviour data"</span>, <span class="co"># This sets the overall plot title.</span>
                  col <span class="op">=</span> <span class="fu">forestplot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/forestplot/man/fpColors.html">fpColors</a></span><span class="op">(</span>zero <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="co"># This sets the colour of the line at 0 (or 1, if it's the plot of a logistic or Cox model)</span>
 <span class="op">)</span></code></pre></div>
-<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-17-1.png" width="672"></p>
+<p><img src="4_IntroToCompositionalDataAnalysis_files/figure-html/unnamed-chunk-18-1.png" width="672"></p>
 <pre><code>#&gt; GRID.VP.43::forestplot_margins</code></pre>
 <p>For additional information on how to customise the functions, see the manual by running e.g. <code><a href="https://rdrr.io/pkg/epicoda/man/plot_transfers.html">?plot_transfers</a></code>.</p>
 </div>
@@ -609,7 +625,7 @@
 <h3 class="hasAnchor">
 <a href="#regression-modelling-further-examples" class="anchor"></a><span class="header-section-number">1.4.4</span> Regression modelling: further examples</h3>
 <p>As well as linear models, we can produce logistic and Cox models:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">log_outcome</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/comp_model.html">comp_model</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"logistic"</span>,
                           outcome <span class="op">=</span> <span class="st">"disease"</span>,
                           covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"agegroup"</span>, <span class="st">"sex"</span><span class="op">)</span>,
@@ -636,7 +652,7 @@
 <h3 class="hasAnchor">
 <a href="#getting-the-numbers-out-predictions-for-particular-compositions" class="anchor"></a><span class="header-section-number">1.4.5</span> Getting the numbers out: predictions for particular compositions</h3>
 <p>To get the numbers out for predictions at particular compositions, we can use the <code>predict_fit_and_ci</code> function (which is wrapped in the plotting functions).This takes a data frame argument for <code>new_data</code>.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/epicoda/man/predict_fit_and_ci.html">predict_fit_and_ci</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">lm_BMI</span>, new_data <span class="op">=</span> <span class="va">new_comp</span>, comp_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"vigorous"</span>, <span class="st">"moderate"</span>, <span class="st">"light"</span>, <span class="st">"sedentary"</span>, <span class="st">"sleep"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"fit"</span>, <span class="st">"lower_CI"</span>, <span class="st">"upper_CI"</span><span class="op">)</span><span class="op">]</span>
 <span class="co">#&gt;          fit   lower_CI   upper_CI</span>
 <span class="co">#&gt; 1 -0.2700925 -0.3302163 -0.2099687</span></code></pre></div>

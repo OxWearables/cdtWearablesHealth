@@ -66,7 +66,7 @@
       <a href="../articles/3_HealthAssociationAnalysis.html">A Basic Health Association Analysis</a>
     </li>
     <li>
-      <a href="../articles/4_IntroToCompositionalDataAnalysis.html">Compositional Data Analysis Tutorial</a>
+      <a href="../articles/4_IntroToCompositionalDataAnalysis.html">Compositional Data Analysis Tutorial (Optional)</a>
     </li>
   </ul>
 </li>
@@ -121,7 +121,7 @@
 <div id="troubleshooting" class="section level1" number="1">
 <h1 class="hasAnchor">
 <a href="#troubleshooting" class="anchor"></a><span class="header-section-number">1</span> Troubleshooting</h1>
-<p>If nothing is working, speak to Rosemary – <a href="mailto:rosemary.walmsley@gtc.ox.ac.uk" class="email">rosemary.walmsley@gtc.ox.ac.uk</a>. If needed, we have pre-processed data you can use.</p>
+<p>If something is not working, speak to Rosemary – <a href="mailto:rosemary.walmsley@gtc.ox.ac.uk" class="email">rosemary.walmsley@gtc.ox.ac.uk</a>.</p>
 </div>
 <div id="introduction-to-available-data" class="section level1" number="2">
 <h1 class="hasAnchor">
@@ -241,7 +241,7 @@
 <li>Health-related exclusions. For example, if you are analysing incident disease, you may wish to exclude people who had prevalent disease at the time they wore the accelerometer.</li>
 <li>Missing covariate data. If small numbers of participants have missing data in covariates, you may wish to exclude them. (Alternatively, you could look into missing data imputation).</li>
 </ul>
-<p><strong>Important:</strong> You should record how many participants were excluded at each of the above steps.</p>
+<p><strong>Important:</strong> You should record how many participants were excluded at each of the above steps. Usually, studies present a <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0040297">flow diagram</a> (see point 13c) to be precise about which groups of participants were left out and why.</p>
 <p><strong>Watch out for NA values</strong> Lots of the R code in these tutorials <a href="https://www.r-bloggers.com/2018/10/subsetting-in-the-presence-of-nas/">will do some very weird things if you have <code>NA</code> values in variables</a>. Have a look and check it’s behaving as you expect.</p>
 </div>
 <div id="preprocessing" class="section level1" number="8">
@@ -255,14 +255,21 @@
 <code class="sourceCode R"><span class="co"># ADD DATE OF BIRTH</span>
 <span class="va">df</span><span class="op">$</span><span class="va">approx_dob</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">YearOfBirth</span>, <span class="va">df</span><span class="op">$</span><span class="va">MonthOfBirth</span>, <span class="st">"15"</span>, sep <span class="op">=</span> <span class="st">"-"</span><span class="op">)</span>,
-          <span class="st">"%Y-%B-%d"</span><span class="op">)</span>
+          <span class="st">"%Y-%B-%d"</span><span class="op">)</span> <span class="co"># UK Biobank doesn't contain day of birth as it would be unnecessary identifying information, so we impute it as the 15th of the birth month. </span>
 
+<span class="co"># ENSURE DATES FORMATTED CORRECTLY</span>
+<span class="va">df</span><span class="op">$</span><span class="va">end_accel_wear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">EndTimWear</span>, <span class="st">"%Y-%m-%d %H:%M:%S"</span>, tz <span class="op">=</span> <span class="st">"Europe/London"</span><span class="op">)</span>
+
+<span class="co"># ADD AGE AT ENTRY IN DAYS</span>
 <span class="va">df</span><span class="op">$</span><span class="va">age_entry_days</span> <span class="op">&lt;-</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/difftime.html">difftime</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">EndTimWear</span>, <span class="st">"%Y-%m-%d %H:%M:%S"</span>, tz <span class="op">=</span> <span class="st">"Europe/London"</span><span class="op">)</span>, 
+  <span class="fu"><a href="https://rdrr.io/r/base/difftime.html">difftime</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">end_accel_wear</span>, 
            <span class="va">df</span><span class="op">$</span><span class="va">approx_dob</span>,
            units <span class="op">=</span> <span class="st">"days"</span><span class="op">)</span>
 
+<span class="co"># CONVERT TO AGE AT ENTRY IN YEARS</span>
 <span class="va">df</span><span class="op">$</span><span class="va">age_entry_years</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">age_entry_days</span><span class="op">)</span><span class="op">/</span><span class="fl">365.25</span>
+
+<span class="co"># ADD AGE GROUPS</span>
 <span class="va">df</span><span class="op">$</span><span class="va">broadAgeGroup</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">age_entry_years</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">50</span>, <span class="fl">60</span>, <span class="fl">70</span>, <span class="fl">80</span> <span class="op">)</span>, right <span class="op">=</span> <span class="cn">FALSE</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"40-49"</span>, <span class="st">"50-59"</span>, <span class="st">"60-69"</span>, <span class="st">"70-79"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>If you’re interested in incident disease analyses, you might also want to add a follow-up time variable i.e. the difference between the time the participant entered the study (accelerometer wear date) and when they left it: death, censoring (end date of study data, at which point they had not had an event) or the event of interest. The next tutorial contains an example.</p>
 <p>Remember to write your prepared dataset to a file so that you can use it again!</p>
@@ -273,7 +280,7 @@
 <p>To find out more about particular UK Biobank variables, use the <a href="https://biobank.ndph.ox.ac.uk/ukb/">Data Showcase</a></p>
 <p>To find out more about UK Biobank data collection and history, <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1001779">this</a> is a good summary</p>
 <p>In addition to what we’ve shared here, UK Biobank is an open resource and several other open-source tools are available to support its use (<a href="https://git.fmrib.ox.ac.uk/fsl/funpack">an example</a>)</p>
-<p>UK Biobank is currently moving to an <a href="https://www.ukbiobank.ac.uk/learn-more-about-uk-biobank/news/uk-biobank-creates-cloud-based-health-data-analysis-platform-to-unleash-the-imaginations-of-the-world-s-best-scientific-minds">Amazon Web Services model</a>.</p>
+<p>UK Biobank is currently moving to an <a href="https://www.ukbiobank.ac.uk/learn-more-about-uk-biobank/news/uk-biobank-creates-cloud-based-health-data-analysis-platform-to-unleash-the-imaginations-of-the-world-s-best-scientific-minds">Amazon Web Services model</a>. In the future, this will likely represent the best way to access UK Biobank data.</p>
 </div>
   </div>
 
