@@ -24,9 +24,13 @@ knitr::opts_chunk$set(echo = TRUE)
 - (Optional) Introduce Compositional Data Analysis in the context of movement behaviour data (Chapter 4)
 
 ## How to use this tutorial 
-This tutorial is designed both as a tutorial and as a reference document. In the practical, it is probably a good idea to read through it sequentially. In the weeks of the Data Challenge, you will be able to come back to different sections and use them as you need. 
+This tutorial is designed both as a tutorial and as a reference document. In the practical, it is probably a good idea to read through sequentially. In the weeks of the Data Challenge, you will be able to come back to different sections and use them as you need.
 
 We all know that with a dynamic document/notebook it is tempting to click through the pieces of code pressing "play" quickly as possible. That is not the way to get the most out of this tutorial. Some of the code chunks might not be things you need. Sometimes, the most useful thing might be to follow links to some of the additional resources and spend time reading those. And don't just focus on the code sections: time spent with a pen and paper designing the analysis might be some of the best-spent time!
+
+Visual inspection of the data is invaluable for understanding what the code is doing. The tutorial does not contain much visual inspection, as we can't print participant data on the internet. Add `head()`, `str()` and other statements to get a feel for the data as you work through the tutorials. 
+
+Do be aware when using RMarkdown that it is easy to share participant data "by accident".
 
 ## Question? Bugs?
 If you have a question, feel free to speak to any of the tutors or contact Rosemary Walmsley (rosemary.walmsley@gtc.ox.ac.uk). 
