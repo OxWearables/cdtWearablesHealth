@@ -37,17 +37,15 @@ pkgs_inst <- pkgs[!{
   pkgs %in% rownames(installed.packages())
 }]
 install.packages(pkgs_inst)
+
 ## GitHub Packages
-if (!{
-  "epicoda" %in% rownames(installed.packages())
-}) {
-  remotes::install_github(
+remotes::install_github(
     repo = "activityMonitoring/epicoda",
     build_opts = "--no-resave-data",
     build_vignettes = TRUE,
     build_manual = TRUE
   ) # TROUBLESHOOTING if this doesn't work, use build_vignettes = FALSE. You have the info from the vignette here!
-}
+
 rm(pkgs, pkgs_inst) # clean up after ourselves
 ```
 
@@ -267,22 +265,23 @@ Another set of estimates that might be of interest are estimates of the differen
 While there are hugely varied compositions which might be possible, one kind of composition is often of interest. This is compositions where one particular part is perturbed at the expense of all other parts proportionally. As this is a common use case, there is a function implemented to do this:
 
 ```{r set-up-forest-data}
-df <- as.data.frame(comp_mean(
+cm <- as.data.frame(comp_mean(
   data = simdata,
   comp_labels = c("vigorous", "moderate", "light", "sedentary", "sleep"),
+  det_limit = 0.0012, 
   units = "hr/day" # Note whatever the units are here is the units
   # you should specify the changes in in the next two lines.
 ))
 new_comp <-
   change_composition(
-    composition = df,
+    composition = cm,
     main_part = "moderate",
     main_change = +0.5,
     comp_labels = c("vigorous", "moderate", "light", "sedentary", "sleep")
   )
 new_comp2 <-
   change_composition(
-    composition = df,
+    composition = cm,
     main_part = "sedentary",
     main_change = -3.5,
     comp_labels = c("vigorous", "moderate", "light", "sedentary", "sleep")
@@ -321,7 +320,7 @@ get_cm_from_model(
   transf_labels = tl_for_check
 )$cm
 # The comp mean calculated above transformed to unitless scale:
-df / 24 
+cm / 24 
 ```
 
 The `forest_plot_comp()` function can also be used to compare models. To do this, leave `model` at its default `NULL` value, and set `models_list` as a named list of models. For example, to compare `lm_BMI` with a model adjusted for `age_group` only and an unadjusted model (very boring in the simulated data because the correlation structure for the simulation wasn't sufficiently rich!):
