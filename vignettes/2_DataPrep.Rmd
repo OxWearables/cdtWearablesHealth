@@ -36,10 +36,17 @@ This tutorial contains:
 9.  Preprocessing
 10. Finding out more 
 
+***
+
+
 # Troubleshooting 
-If something is not working, speak to Rosemary – rosemary.walmsley@gtc.ox.ac.uk.
+
+If something is not working, speak to [Rosemary](mailto:rosemary.walmsley@gtc.ox.ac.uk).
 
 Often the first thing to check is that all the files can be found in the specified locations. 
+
+***
+
 
 # UK Biobank
 
@@ -55,6 +62,8 @@ It has several components:
 - Just over 100,000 participants took part in a 7-day wrist-worn accelerometer wear between 2013 and 2015.
 - Many optional online questionnaires have been conducted, on topics as diverse as diet, mental health, cognitive function, and more.
 - Some participants have returned for a repeat of baseline assessment centre. Participants are currently returning for a repeat of baseline assessment along with imaging.
+
+***
 
 
 # Available data 
@@ -77,6 +86,9 @@ We provide several files locally. These can be found under `/cdtshared/wearables
 We will use the RAP to add variables not available in the prepared dataset.
 
 Data should **never** be downloaded to your local machine: you should always be working on the VM. All data should be deleted at the end of the Data Challenge. We will email you to confirm this.
+
+***
+
 
 # Downloading covariate data
 
@@ -146,7 +158,7 @@ Create a RAP account (or log in if you have an account)
 
 - The RAP system can be slow. Please be patient.
 
-## Step 4: Downloading the cohort / dataset
+## Step 4: Exporting the cohort / dataset to `csv`
 
 - First, you need to create a `csv` file.
 
@@ -158,19 +170,44 @@ Create a RAP account (or log in if you have an account)
 
 ![Screengrab 4](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide4.PNG)
 
-- You can download the data in different formats. UKB variables have field numbers as well as names, and categorical variables are stored as numbers to reduce the size of the dataset. To download a csv file with variable names and variable coding already done, choose the output file format as **csv**, coding option **REPLACE** and header style **FIELD NAME**. 
+- You can export the data in different formats. UKB variables have field numbers as well as names, and categorical variables are stored as numbers to reduce the size of the dataset. To download a csv file with variable names and variable coding already done, choose the output file format as **csv**, coding option **REPLACE** and header style **FIELD NAME**. 
 
 - Click on **Start Analysis** on the top right
 
 - Once the conversion finishes and the file is ready, you will be notified via email. To access the file, either return to your project, or click the link in the email.
 
-- To download the csv file, tick the box next to the chosen file and click on **Download** on the top right, then click on the download sign in the new window:
+## Step 5: Download the `csv` file to the VM
 
-![Screengrab 5](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide5.PNG)
+- Do **not** download the file using the **Download** button, as this will download to your device 
+
+- Instead, use the RAP command line interface
+
+- Login to the VM and complete all steps below on the VM
+
+- Load a pip environment:
+```{r, engine = bash, eval = FALSE}
+python3 -m venv my_new_env
+source my_new_env/bin/activate
+```
+
+- Run `pip3 install dxpy` ([Downloads - DNAnexus Documentation](https://documentation.dnanexus.com/downloads)).You may find you need to update `pip`: `pip install --upgrade pip`.
+
+- Run `dx login` to log you in to the RAP ([Command Line Quickstart - DNAnexus Documentation](https://documentation.dnanexus.com/getting-started/tutorials/cli-quickstart))
+
+- Run `dx cd CDT/`  to navigate between directories on the RAP
+
+- To download the file `my_new_cohort.csv`, run `dx download my_new_cohort_filename.csv` 
+
+- Logout using `dx logout`. Your file should now be downloaded. 
+
+***
+
+
+## Do it with your own cohort
 
 You can repeat this with your own cohort. To create one, click on the **base_cohort_wearables_light** (this cohort contains only eid and sex) and add the columns you need (see previous steps), save the new cohort, convert to csv and download the file.
 
-Sometimes you might want to add only one or two variables that you realise are relevant. Note that the quickest way to do this is to add these variables to the bare **base_cohort_wearables_light** and then merge your downloaded csv file into the copy of the dataset you"re already working with locally. 
+Sometimes you might want to add only one or two variables that you realise are relevant. Note that the quickest way to do this is to add these variables to the bare **base_cohort_wearables_light** and then merge your downloaded csv file into the copy of the dataset you're already working with locally. 
 
 Feel free to try out other data visualisation features of the browser (e.g. adding **Tiles** to the **Dashboard**). Stick to using "standard" covariate data only: the Bulk data (e.g. genetic data) is beyond the scope of this challenge. It may also be expensive or tricky to process!
 
@@ -192,6 +229,7 @@ This dataset includes hospital admissions only. You will probably also want to u
 Censoring dates for all outcome data at time of download of these files were 2021-02-28 for the death register; 2021-03-31 for HES in England and Scotland, 2018-02-28 for HES in Wales. Read more about what these censoring dates mean [here](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=Data_providers_and_dates).
 
 ## Defining the outcome
+
 One of the challenges in the Data Challenge will be working out how to define your health outcome. Some things to think about: 
 
 - Disease codes in HES data and on the death register mostly use [ICD-10 codes](https://icd.who.int/browse10/2010/en). Some records from the 1990s and earlier use its precursor, ICD-9, but this is a small proportion.
@@ -204,10 +242,15 @@ One of the challenges in the Data Challenge will be working out how to define yo
 - There are some quirks to the HES data. For example, psychiatric admissions are included in English and Welsh data, but not in Scottish data. 
 - If you want to learn more about HES data in UK Biobank, see [this resource](biobank.ndph.ox.ac.uk/ukb/ukb/docs/HospitalEpisodeStatistics.pdf).
 
-# Merging data files
-You can merge data files using the ‘eid’ column.
+***
 
-Note that with accelerometer data, the ‘eid’ column may need adjusting to remove extra text e.g. 
+
+# Merging data files
+
+You can merge data files using the "eid" column.
+
+Note that with accelerometer data, the "eid" column may need adjusting to remove extra text. 
+
 ```{r accdat}
 # First we"ll load data.table, a package that makes reading large files easier
 if (!require("data.table")) install.packages("data.table")
@@ -228,9 +271,15 @@ rm(df_acc, df_cov)
 
 Note that the "eid" column is different for every UK Biobank project. Therefore, you can use it to merge files within the same project, but not to merge files between projects.
 
+***
+
+
 # Withdrawals 
 
 It is useful to know that participants have the right to withdraw at any time from UK Biobank. One of the advantages of using the RAP system is that participants are withdrawn automatically from datasets on the RAP. We have manually withdrawn participants from the other datasets we have provided in the CDT, so you do not need to perform withdrawals in this particular project.
+
+***
+
 
 # Exclusions 
 
@@ -310,6 +359,9 @@ tab_exc
 ```
 
 **Watch out for NA values** Lots of the R code in these tutorials [will do some very weird things if you have `NA` values in variables](https://www.r-bloggers.com/2018/10/subsetting-in-the-presence-of-nas/). Have a look and check it's behaving as you expect. 
+
+***
+
 
 # Preprocessing 
 
@@ -465,6 +517,9 @@ data.table::fwrite(df_final, "../data_and_data_prep/dataset-with-preprocessing-d
 
 
 **These preparatory steps are indicative of the kind of thing you might want to look at. They are not exhaustive. Think through the steps you need for the analysis you want to do e.g. adding more covariates.** 
+
+***
+
 
 # Finding out more
 
