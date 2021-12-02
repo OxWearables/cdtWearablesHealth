@@ -1,0 +1,7 @@
+[ {
+        "disease": "ischaemic-heart-disease", 
+        "desc": "IHD used in Rema Ramakrishnan paper", 
+        "icd10": "I2[0-5]",
+        "icd9": "-" 
+    , "level": "all"}
+]

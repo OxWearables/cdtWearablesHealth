@@ -16,7 +16,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Preamble 
+
 ## Objectives 
+
 - Discuss key issues when designing and conducting health association analysis using UK Biobank wearables data (Chapter 0)
 - Set up RStudio access (Chapter 1)
 - Outline steps in preparing UK Biobank data for health association analysis, indicating available resources (Chapter 2)
@@ -24,23 +26,30 @@ knitr::opts_chunk$set(echo = TRUE)
 - (Optional) Introduce Compositional Data Analysis in the context of movement behaviour data (Chapter 4)
 
 ## How to use this tutorial 
-This tutorial is designed both as a tutorial and as a reference document. In the practical, it is probably a good idea to read through it sequentially. In the weeks of the Data Challenge, you will be able to come back to different sections and use them as you need. 
+
+This tutorial is designed both as a tutorial and as a reference document. In the practical, it is probably a good idea to read through sequentially. In the weeks of the Data Challenge, you will be able to come back to different sections and use them as you need.
 
 We all know that with a dynamic document/notebook it is tempting to click through the pieces of code pressing "play" quickly as possible. That is not the way to get the most out of this tutorial. Some of the code chunks might not be things you need. Sometimes, the most useful thing might be to follow links to some of the additional resources and spend time reading those. And don't just focus on the code sections: time spent with a pen and paper designing the analysis might be some of the best-spent time!
 
-## Question? Bugs?
-If you have a question, feel free to speak to any of the tutors or contact Rosemary Walmsley (rosemary.walmsley@gtc.ox.ac.uk). 
+Visual inspection of the data is invaluable for understanding what the code is doing. The tutorial does not contain much visual inspection, as we can't print participant data on the internet. Add `head()`, `str()` and other statements to get a feel for the data as you work through the tutorials. 
 
-There are probably bugs. If you find them, please let me (Rosemary) know and I will fix them!
+Do be aware when using RMarkdown that it is easy to share participant data "by accident" if you print it as you go.
+
+## Question? Bugs?
+
+If you have a question, feel free to speak to any of the tutors or contact [Rosemary Walmsley](mailto::rosemary.walmsley@gtc.ox.ac.uk). 
+
+There are probably bugs. If you find them, please let me (Rosemary) know!
 
 # Health association analysis with wearables data
 
 ## Thinking through the question
-As discussed in the lecture it's a good idea to think in detail about what your question is before getting started. (Yes, we know this is stating the obvious... But just treat this section like permission to spend at least 20 minutes of the workshop thinking through some of these things :) )
 
-For this workshop, we'll start with the seemingly simple question: **What is the effect of physical activity on risk of ischaemic heart disease?** 
+As discussed in the lecture it's a good idea to think in detail about what your question is before getting started. (Yes, we know this is stating the obvious... But just treat this section like permission to spend at least 20 minutes of the practical thinking through some of these things :) )
 
-In the data challenge, your question might be substantially more complex.
+For this workshop, we'll start with the seemingly simple question: **How is overall physical activity associated with risk of ischaemic heart disease?** 
+
+You will have a different question for the Data Challenge. 
 
 ### Population 
 
@@ -49,6 +58,13 @@ In the data challenge, your question might be substantially more complex.
 - Will results in the study population be generalisable to the target population? 
 
 One particular issue you might want to consider is whether you want to exclude some people from the study population. For example, you might exclude people who already have ischaemic heart disease, as they can't go on to develop the disease. You might also exclude people who have problems with data quality. 
+
+Further reading on selection into UK Biobank: 
+
+- https://pubmed.ncbi.nlm.nih.gov/28641372/
+- https://www.bmj.com/content/368/bmj.m131
+- The long debate in IJE referenced by the previous paper (references 14 - 23)
+- https://www.nature.com/articles/s41467-021-21073-y
 
 ### Exposure 
 
@@ -66,13 +82,16 @@ In this case, we might ask how we can operationalise the vague concept "physical
 - Is it the outcome of interest, or is it a surrogate/proxy?  
 
 How can ischaemic heart disease be defined based on the available data sources? For example, which hospital admission codes are relevant? 
+Read more: 
+
+- [This paper](https://pubmed.ncbi.nlm.nih.gov/32616677/) considers stroke outcomes in different data sources in UK Biobank.
 
 ### Is the exposure associated with the outcome? 
 
 - How can you characterise/test/model this association?
 - Is there evidence for an association?
 
-Working with death data, we might be interested in a time-to-event outcome and so in using survival analysis methods (such as Cox regression). Do we expect a linear association, or do we need to use methods that can cope with non-linearity? 
+We might be interested in a time-to-event outcome and so in using survival analysis methods (such as Cox regression). Do we expect a linear association (on the appropriate scale), or do we need to use methods that can cope with non-linearity? 
 
 ### Is the association causal? 
 
@@ -81,7 +100,11 @@ Working with death data, we might be interested in a time-to-event outcome and s
 
 Can we address confounding by adjusting for possible confounders? Can we assess impact of reverse causality (e.g. by excluding a period of follow-up)? 
 
-**Cause** is probably the single most controversial word in epidemiology. Here, we're interested in understanding causal effects. But, the data is observational and observational data is known to be subject to a lot of potential biases. This means people usually avoid causal language in describing observational results, while still using methods to attempt to get at causality (although [whether we should entirely avoid this language is controversial](https://ajph.aphapublications.org/doi/10.2105/AJPH.2018.304337)).
+Read more: 
+
+- Bradford Hill's original [exposition of the Bradford Hill criteria](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1898525/) and a [comic strip version](https://livefreeordichotomize.com/2016/12/15/hill-for-the-data-scientist-an-xkcd-story/)
+- [DAGs](http://dagitty.net/learn/)
+- **Cause** is a very difficult word. Here, we're interested in understanding causal effects. But, the data is observational and observational data is known to be subject to a lot of potential biases. This means people usually avoid causal language in describing observational results, while still using methods to attempt to get at causality (although [whether we should entirely avoid this language is controversial](https://ajph.aphapublications.org/doi/10.2105/AJPH.2018.304337)).
 
 
 
