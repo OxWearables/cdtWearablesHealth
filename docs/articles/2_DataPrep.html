@@ -173,6 +173,7 @@
 <a href="#downloading-covariate-data" class="anchor"></a><span class="header-section-number">4</span> Downloading covariate data</h1>
 <p>This section explains how to use the RAP to download different sets of variables. If all the covariate data needed for your analysis is available in <code>base_cohort_wearables.csv</code> you might not actually need to do this in the Data Challenge. But you can still spend some time exploring the platform.</p>
 <p>Read more about the platform in the <a href="https://dnanexus.gitbook.io/uk-biobank-rap/working-on-the-research-analysis-platform/ukb-rap">user guide</a>. Here is a <a href="https://dnanexus.gitbook.io/uk-biobank-rap/getting-started/platform-overview">Quickstart Guide</a>.</p>
+<p>Using the platform does entail processing and storage costs. You have some credit to start with. If you stick to the kinds of tasks mentioned in this tutorial (processing and visualising covariate data and filtering participants), you are unlikely to run into any problems.</p>
 <div id="step-1-approval" class="section level2" number="4.1">
 <h2 class="hasAnchor">
 <a href="#step-1-approval" class="anchor"></a><span class="header-section-number">4.1</span> Step 1: Approval</h2>
@@ -205,7 +206,7 @@
 <li><p>The file <code>base_cohort_wearables_dec21</code> is the file available locally as <code>base_cohort_wearables</code>. This file includes the UKB wearables cohort with a set of covariates (demographics, biometrics etc.).</p></li>
 </ul>
 <div class="figure">
-<img src="../../waibel-julia-screengrabs-RAP-2021-11-28/Slide1.PNG" alt=""><p class="caption">Screengrab 1</p>
+<img src="../waibel-julia-screengrabs-RAP-2021-11-28/Slide1.PNG" alt=""><p class="caption">Screengrab 1</p>
 </div>
 <ul>
 <li><p>In the cohort browser <strong>Data Preview</strong> you can see the variables included in this dataset.</p></li>
@@ -213,7 +214,7 @@
 <li><p>Choose the variable from one of the folders that are shown on the left and click on <strong>Add as column</strong> (e.g. drive faster than motorway speed limit):</p></li>
 </ul>
 <div class="figure">
-<img src="../../waibel-julia-screengrabs-RAP-2021-11-28/Slide2.PNG" alt=""><p class="caption">Screengrab 2</p>
+<img src="../waibel-julia-screengrabs-RAP-2021-11-28/Slide2.PNG" alt=""><p class="caption">Screengrab 2</p>
 </div>
 <ul>
 <li><p><strong>A note on instances and array indices</strong>: Variables in UK Biobank come with instances and array indices. For most variables with instancing, repeat 1 refers to a resurvey among a limited number of participants and repeat 2 is the imaging visit. Both apply only to a subset of participants. More importantly, some variables have multiple items, as participants could give multiple answers (e.g. employment history) or had multiple measurements taken at a single visit (e.g. blood pressure measurements).</p></li>
@@ -224,7 +225,7 @@
 <li><p>Once all filters are set and all variables needed have been added as columns, you can save the cohort by clicking on the save sign in the top right hand corner:</p></li>
 </ul>
 <div class="figure">
-<img src="../../waibel-julia-screengrabs-RAP-2021-11-28/Slide3.PNG" alt=""><p class="caption">Screengrab 3</p>
+<img src="../waibel-julia-screengrabs-RAP-2021-11-28/Slide3.PNG" alt=""><p class="caption">Screengrab 3</p>
 </div>
 <ul>
 <li><p>Choose a name and save the cohort under <code>CDT/CDTgroupX/</code>.</p></li>
@@ -243,7 +244,7 @@
 <li><p>Within the Table Exporter app, open the <strong>Analysis Inputs 1</strong> tab on the right side of the screen. Then click the <strong>Dataset or Cohort or Dashboard</strong> tile.</p></li>
 </ul>
 <div class="figure">
-<img src="../../waibel-julia-screengrabs-RAP-2021-11-28/Slide4.PNG" alt=""><p class="caption">Screengrab 4</p>
+<img src="../waibel-julia-screengrabs-RAP-2021-11-28/Slide4.PNG" alt=""><p class="caption">Screengrab 4</p>
 </div>
 <ul>
 <li><p>You can export the data in different formats. UKB variables have field numbers as well as names, and categorical variables are stored as numbers to reduce the size of the dataset. To download a csv file with variable names and variable coding already done, choose the output file format as <strong>csv</strong>, coding option <strong>REPLACE</strong> and header style <strong>FIELD NAME</strong>.</p></li>
@@ -276,7 +277,7 @@
 <a href="#do-it-with-your-own-cohort" class="anchor"></a><span class="header-section-number">4.6</span> Do it with your own cohort</h2>
 <p>You can repeat this with your own cohort. To create one, click on the <strong>base_cohort_wearables_light</strong> (this cohort contains only eid and sex) and add the columns you need (see previous steps), save the new cohort, convert to csv and download the file.</p>
 <p>Sometimes you might want to add only one or two variables that you realise are relevant. Note that the quickest way to do this is to add these variables to the bare <strong>base_cohort_wearables_light</strong> and then merge your downloaded csv file into the copy of the dataset you’re already working with locally.</p>
-<p>Feel free to try out other data visualisation features of the browser (e.g. adding <strong>Tiles</strong> to the <strong>Dashboard</strong>). Stick to using “standard” covariate data only: the Bulk data (e.g. genetic data) is beyond the scope of this challenge. It may also be expensive or tricky to process!</p>
+<p>Feel free to try out other data visualisation features of the browser (e.g. adding <strong>Tiles</strong> to the <strong>Dashboard</strong>). Stick to using “standard” covariate data only. Do not use the <strong>Bulk</strong> data (e.g. genetic data). It is beyond the scope of this challenge. It may also be expensive or tricky to process.</p>
 </div>
 </div>
 <div id="processing-health-outcomes-data" class="section level1" number="5">

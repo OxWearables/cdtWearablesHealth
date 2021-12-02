@@ -130,7 +130,7 @@ Create a RAP account (or log in if you have an account)
 
 - The file `base_cohort_wearables_dec21` is the file available locally as `base_cohort_wearables`. This file includes the UKB wearables cohort with a set of covariates (demographics, biometrics etc.).
 
-![Screengrab 1](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide1.PNG)
+![Screengrab 1](../waibel-julia-screengrabs-RAP-2021-11-28/Slide1.PNG)
 
 - In the cohort browser **Data Preview** you can see the variables included in this dataset.
 
@@ -138,7 +138,7 @@ Create a RAP account (or log in if you have an account)
 
 - Choose the variable from one of the folders that are shown on the left and click on **Add as column** (e.g. drive faster than motorway speed limit):
 
-![Screengrab 2](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide2.PNG)
+![Screengrab 2](../waibel-julia-screengrabs-RAP-2021-11-28/Slide2.PNG)
 
 - **A note on instances and array indices**:  Variables in UK Biobank come with instances and array indices. For most variables with instancing, repeat 1 refers to a resurvey among a limited number of participants and repeat 2 is the imaging visit. Both apply only to a subset of participants. More importantly, some variables have multiple items, as participants could give multiple answers (e.g. employment history) or had multiple measurements taken at a single visit (e.g. blood pressure measurements).
 
@@ -152,7 +152,7 @@ Create a RAP account (or log in if you have an account)
 
 - Once all filters are set and all variables needed have been added as columns, you can save the cohort by clicking on the save sign in the top right hand corner:
 
-![Screengrab 3](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide3.PNG)
+![Screengrab 3](../waibel-julia-screengrabs-RAP-2021-11-28/Slide3.PNG)
 
 - Choose a name and save the cohort under `CDT/CDTgroupX/`.
 
@@ -170,7 +170,7 @@ Create a RAP account (or log in if you have an account)
 
 - Within the Table Exporter app, open the **Analysis Inputs 1** tab on the right side of the screen. Then click the **Dataset or Cohort or Dashboard** tile. 
 
-![Screengrab 4](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide4.PNG)
+![Screengrab 4](../waibel-julia-screengrabs-RAP-2021-11-28/Slide4.PNG)
 
 - You can export the data in different formats. UKB variables have field numbers as well as names, and categorical variables are stored as numbers to reduce the size of the dataset. To download a csv file with variable names and variable coding already done, choose the output file format as **csv**, coding option **REPLACE** and header style **FIELD NAME**. 
 
