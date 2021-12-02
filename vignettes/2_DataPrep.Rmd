@@ -96,6 +96,8 @@ This section explains how to use the RAP to download different sets of variables
 
 Read more about the platform in the [user guide](https://dnanexus.gitbook.io/uk-biobank-rap/working-on-the-research-analysis-platform/ukb-rap). Here is a [Quickstart Guide](https://dnanexus.gitbook.io/uk-biobank-rap/getting-started/platform-overview). 
 
+Using the platform does entail processing and storage costs. You have some credit to start with. If you stick to the kinds of tasks mentioned in this tutorial (processing and visualising covariate data and filtering participants), you are unlikely to run into any problems. 
+
 ## Step 1: Approval
 
 Before you can use the Research Analysis Platform, you need to:
@@ -185,7 +187,8 @@ Create a RAP account (or log in if you have an account)
 - Login to the VM and complete all steps below on the VM
 
 - Load a pip environment:
-```{r, engine = bash, eval = FALSE}
+
+```{r pipenv, engine = 'bash', eval = FALSE}
 python3 -m venv my_new_env
 source my_new_env/bin/activate
 ```
@@ -209,7 +212,9 @@ You can repeat this with your own cohort. To create one, click on the **base_coh
 
 Sometimes you might want to add only one or two variables that you realise are relevant. Note that the quickest way to do this is to add these variables to the bare **base_cohort_wearables_light** and then merge your downloaded csv file into the copy of the dataset you're already working with locally. 
 
-Feel free to try out other data visualisation features of the browser (e.g. adding **Tiles** to the **Dashboard**). Stick to using "standard" covariate data only: the Bulk data (e.g. genetic data) is beyond the scope of this challenge. It may also be expensive or tricky to process!
+Feel free to try out other data visualisation features of the browser (e.g. adding **Tiles** to the **Dashboard**). Stick to using "standard" covariate data only. Do not use the **Bulk** data (e.g. genetic data). It is beyond the scope of this challenge. It may also be expensive or tricky to process.
+
+
 
 # Processing health outcomes data 
 
