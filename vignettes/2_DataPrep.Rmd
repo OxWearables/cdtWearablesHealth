@@ -130,7 +130,7 @@ Create a RAP account (or log in if you have an account)
 
 - The file `base_cohort_wearables_dec21` is the file available locally as `base_cohort_wearables`. This file includes the UKB wearables cohort with a set of covariates (demographics, biometrics etc.).
 
-![Screengrab 1](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide1.PNG)
+![Screengrab 1](../waibel-julia-screengrabs-RAP-2021-11-28/Slide1.PNG)
 
 - In the cohort browser **Data Preview** you can see the variables included in this dataset.
 
@@ -138,7 +138,7 @@ Create a RAP account (or log in if you have an account)
 
 - Choose the variable from one of the folders that are shown on the left and click on **Add as column** (e.g. drive faster than motorway speed limit):
 
-![Screengrab 2](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide2.PNG)
+![Screengrab 2](../waibel-julia-screengrabs-RAP-2021-11-28/Slide2.PNG)
 
 - **A note on instances and array indices**:  Variables in UK Biobank come with instances and array indices. For most variables with instancing, repeat 1 refers to a resurvey among a limited number of participants and repeat 2 is the imaging visit. Both apply only to a subset of participants. More importantly, some variables have multiple items, as participants could give multiple answers (e.g. employment history) or had multiple measurements taken at a single visit (e.g. blood pressure measurements).
 
@@ -152,7 +152,7 @@ Create a RAP account (or log in if you have an account)
 
 - Once all filters are set and all variables needed have been added as columns, you can save the cohort by clicking on the save sign in the top right hand corner:
 
-![Screengrab 3](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide3.PNG)
+![Screengrab 3](../waibel-julia-screengrabs-RAP-2021-11-28/Slide3.PNG)
 
 - Choose a name and save the cohort under `CDT/CDTgroupX/`.
 
@@ -170,7 +170,7 @@ Create a RAP account (or log in if you have an account)
 
 - Within the Table Exporter app, open the **Analysis Inputs 1** tab on the right side of the screen. Then click the **Dataset or Cohort or Dashboard** tile. 
 
-![Screengrab 4](../../waibel-julia-screengrabs-RAP-2021-11-28/Slide4.PNG)
+![Screengrab 4](../waibel-julia-screengrabs-RAP-2021-11-28/Slide4.PNG)
 
 - You can export the data in different formats. UKB variables have field numbers as well as names, and categorical variables are stored as numbers to reduce the size of the dataset. To download a csv file with variable names and variable coding already done, choose the output file format as **csv**, coding option **REPLACE** and header style **FIELD NAME**. 
 
@@ -223,8 +223,9 @@ We have provided a utility script (`other_processing_scripts/addNewHES.py`) to a
 Then run:
 
 ```{r bashcmds, engine = 'bash', eval = FALSE}
-python other_processing/addNewHES.py data/base_cohort_wearables.csv data/hesin_all.csv data/base_cohort_wearables_with_hes.csv other_processing/icdGroupsIHD.json --incident_prevalent True --date_column 90011-0-0 # This last argument means incident vs prevalent disease is defined 
+python other_processing/addNewHES.py /cdtshared/wearables/health_data_files/base_cohort_wearables.csv /cdtshared/wearables/health_data_files/hesin_all.csv data/base_cohort_wearables_with_hes.csv other_processing/icdGroupsIHD.json --incident_prevalent True --date_column p90011 # This last argument means incident vs prevalent disease is defined 
 # relative to the end of accelerometer wear
+# Note you should replace "data/base_cohort_wearables_with_hes.csv" with where you want to save file
 ```
 
 This will add a column containing the date of first instance of the given disease definition, as well as a binary column indicating incident disease and a binary column indicating prevalent disease (relative to the date in the specified date column). 
@@ -261,8 +262,8 @@ Note that with accelerometer data, the "eid" column may need adjusting to remove
 if (!require("data.table")) install.packages("data.table")
 
 # Then we load acc data and covariate data
-df_acc <- data.table::fread("../data_and_data_prep/accelerometer.csv", data.table = FALSE)
-df_cov <- data.table::fread("../data_and_data_prep/base_cohort_wearables_with_hes.csv", data.table = FALSE)
+df_acc <- data.table::fread("../data_and_data_prep/accelerometer.csv", data.table = FALSE) # replace file location with /cdtshared/wearables/health_data_files/accelerometer.csv
+df_cov <- data.table::fread("../data_and_data_prep/base_cohort_wearables_with_hes.csv", data.table = FALSE) # replace file location with location in which you saved the cohort with added HES data
 
 # Then we relabel eids to same format
 df_acc$eid <- sub("_90001_0_0.gz", "", df_acc$eid) # This line replaces the first string with the second one wherever it appears in acc$eid
@@ -503,7 +504,7 @@ aggregate(df$fu_years, list(df$inc_ihd), FUN=median)
 ```
 
 
-We"ll also inspect variables we want to use, to check if there's any *a priori* recoding we want to do: 
+We'll also inspect variables we want to use, to check if there's any *a priori* recoding we want to do: 
 
 ```{r smoking}
 summary(df$smoking)
@@ -517,7 +518,7 @@ We might want to take some time now to tidy up the data. We've got data from mul
 ```{r writedat}
 hour_of_day_cols <- colnames(df)[grepl("hourOfDay", colnames(df))] # we"ll use these in next tutorial
 df_final <- df[, c("age_entry_days", "age_entry_years", "age_gp", "sex", "smoking", "BMI", "inc_ihd", "date_fu", "fu_time", "end_accel_wear", "acc.overall.avg", "MVPA.overall.avg", "light.overall.avg", "sedentary.overall.avg", "sleep.overall.avg", hour_of_day_cols)]
-data.table::fwrite(df_final, "../data_and_data_prep/dataset-with-preprocessing-done.csv")
+data.table::fwrite(df_final, "../data_and_data_prep/dataset-with-preprocessing-done.csv") # replace with location in which to save file
 ```
 
 
