@@ -6,7 +6,7 @@ Author: person("Rosemary", "Walmsley", email = "rosemary.walmsley@gtc.ox.ac.uk",
                   role = c("aut", "cre"))
 Maintainer: <rosemary.walmsley@gtc.ox.ac.uk>
 Description: This set of tutorials supports health association analysis using UK Biobank accelerometry data. The [webpage](https://activitymonitoring.github.io/week2DataChallenge/) contains all the tutorials under the Articles tab. The tutorials go in order. The first three can be done from Friday afternoon onwards. The final tutorial (Compositional Data Analysis) will be covered in one of Monday's sessions. 
-License: MIT + file LICENSE
+License: LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.6.0)
